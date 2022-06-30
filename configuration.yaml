@@ -1,0 +1,37 @@
+
+# Configure a default setup of Home Assistant (frontend, api, etc)
+default_config:
+
+recorder:
+  db_url: !secret psql_string
+  db_retry_wait: 15
+  exclude:
+    domains:
+      - automation
+      - updater
+    entity_globs:
+      - sensor.weather_*
+    entities:
+      - sun.sun
+      - sensor.last_boot
+      - sensor.date
+    event_types:
+      - call_service
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+sensor: !include sensor.yaml
+utility_meter: !include utility_meter.yaml
+
+frontend:
+  themes: !include_dir_merge_named themes
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - !secret proxy_ip
