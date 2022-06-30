@@ -1,0 +1,43 @@
+esphome:
+  name: pool-monitor
+
+esp8266:
+  board: nodemcuv2
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+
+ota:
+  password: "0e71951840966d7a85fd01518507dbf9"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Pool-Monitor Fallback Hotspot"
+    password: "UpZMicD4Rozu"
+
+captive_portal:
+    
+# Example configuration entry
+dallas:
+  - pin: 4
+
+sensor:
+  - platform: dallas
+    address: 0x18041655af9aff28
+    name: "Pool Temperature"
+    
+  - platform: dht
+    pin: D5
+    model: AM2302
+    temperature:
+      name: "Office Temperature"
+    humidity:
+      name: "Office Humidity"
+    update_interval: 60s
