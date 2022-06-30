@@ -35,12 +35,6 @@ sensor:
     entity_id: sensor.pool_temperature
     internal: true
 
-
-#time:
-#  - platform: homeassistant
-#    timezone: America/Halifax
-#    id: esptime
-
 font:
   - file: 'arial.ttf'
     id: arial10
@@ -49,10 +43,6 @@ font:
   - file: 'arial.ttf'
     id: arial12
     size: 12
-    
-#  - file: 'arial.ttf'
-#    id: arial32
-#    size: 32
 
 i2c:
   sda: D1
