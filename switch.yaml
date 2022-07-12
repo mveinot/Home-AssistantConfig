@@ -1,0 +1,7 @@
+- platform: broadlink
+  host: 192.168.10.142
+  mac: b4:43:0d:e4:30:f5
+  switches:
+    - name: Denon 3808
+      command_on: 'JgCIAAsXDDkMFwsXChkJPAsXChkJOwo7CjsLOgsXChkJGQoABcUJGQw5CxgJGQoZCRkKOws6CxcKGQkZChkJOwo7CjsKAAXFCxcKOwoYChkKGAo7ChkJGQo7CjsLOgs5ChkLFwoZCgAFxAwXCjsJGQoZCRkKGQk8CTsKGQkZChkJGQo7CjsLOgkADQU='
+      command_off: 'JgBMAAk8CTsKAAXFChgKOwoZCRkKGQkZCTwKGAo7CjsKOwo7CRkKGQkZCgAFxQkZCjsKGQkZCRoJOwoZCTwJGQoZCRkKGQk7CjsKOgsADQUAAAAAAAAAAAAAAAA='
