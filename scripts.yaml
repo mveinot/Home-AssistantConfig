@@ -1,0 +1,35 @@
+denon_on:
+  sequence:
+    - service: remote.send_command
+      target:
+        entity_id: remote.rm_mini_3_remote
+      data:
+        device: denon3808
+        command: poweron
+
+denon_off:
+  sequence:
+    - service: remote.send_command
+      target:
+        entity_id: remote.rm_mini_3_remote
+      data:
+        device: denon3808
+        command: poweroff
+
+denon_vol_down:
+  sequence:
+    - service: remote.send_command
+      target:
+        entity_id: remote.rm_mini_3_remote
+      data:
+        device: denon3808
+        command: voldown
+
+denon_vol_up:
+  sequence:
+    - service: remote.send_command
+      target:
+        entity_id: remote.rm_mini_3_remote
+      data:
+        device: denon3808
+        command: volup
