@@ -1,1 +1,22 @@
-[]
+- id: '1657646410029'
+  alias: Turn on Amp at 7am
+  description: ''
+  trigger:
+  - platform: time
+    at: 07:00:00
+  condition: []
+  action:
+  - service: script.denon_on
+    data: {}
+  mode: single
+- id: '1657646458863'
+  alias: Turn Amp off at 10pm
+  description: ''
+  trigger:
+  - platform: time
+    at: '22:00:00'
+  condition: []
+  action:
+  - service: script.denon_off
+    data: {}
+  mode: single
