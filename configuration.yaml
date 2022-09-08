@@ -25,6 +25,7 @@ tts:
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
+mqtt: !include mqtt.yaml
 sensor: !include sensor.yaml
 switch: !include switch.yaml
 utility_meter: !include utility_meter.yaml
