@@ -1,37 +1,6 @@
-- platform: mqtt
-  name: 'Home Electricity Watts'
-  state_topic: 'rtl_433/mars/devices/Efergy-e2CT/60867/current'
-  unit_of_measurement: W
-  value_template: "{{ value | round(2) * 120 }}"
-  device_class: power
-
 - platform: integration
   name: home_electricity_kWh
   source: sensor.home_electricity_watts
   round: 3
   method: left
   unit_prefix: k
-
-  #- platform: mqtt
-  #name: 'Bell Download'
-  #state_topic: 'bandwidth/bell-aliant'
-  #unit_of_measurement: 'Mbps'
-  #value_template: "{{ (value_json.download | int / 1048576) | round(0) }}"
-
-  #- platform: mqtt
-  #name: 'Bell Upload'
-  #state_topic: 'bandwidth/bell-aliant'
-  #unit_of_measurement: 'Mbps'
-  #value_template: "{{ (value_json.upload | int / 1048576) | round(0) }}"
-
-  #- platform: mqtt
-  #name: 'Bell Ping'
-  #state_topic: 'bandwidth/bell-aliant'
-  #unit_of_measurement: 'ms'
-  #value_template: "{{value_json.ping}}"
-
-  #- platform: mqtt
-  #name: 'Bell Jitter'
-  #state_topic: 'bandwidth/bell-aliant'
-  #unit_of_measurement: 'ms'
-  #value_template: "{{value_json.jitter}}"
