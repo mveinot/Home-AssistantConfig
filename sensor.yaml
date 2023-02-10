@@ -4,3 +4,27 @@
   round: 3
   method: left
   unit_prefix: k
+
+- platform: statistics
+  name: "24h Upload Average"
+  entity_id: sensor.bell_upload
+  sampling_size: 20
+  state_characteristic: mean
+  max_age:
+    hours: 24
+
+- platform: statistics
+  name: "24h Download Average"
+  entity_id: sensor.bell_download
+  sampling_size: 20
+  state_characteristic: mean
+  max_age:
+    hours: 24
+
+- platform: sql
+  db_url: !secret psql_string
+  queries:
+    - name: HA Database Size
+      query: "SELECT (pg_database_size('homeassistant')/1024/1024) as db_size;"
+      column: "db_size"
+      unit_of_measurement: MB

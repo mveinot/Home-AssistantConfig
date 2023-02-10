@@ -20,3 +20,109 @@
   - service: script.denon_off
     data: {}
   mode: single
+- id: '1665437965146'
+  alias: Turn off Front washroom lights
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - light.switchlinc_dimmer_1d_4a_dc
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  condition: []
+  action:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.switchlinc_dimmer_1d_4a_dc
+  mode: single
+- id: '1665764761019'
+  alias: Automatically turn off front washroom fan
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.front_washroom_exhaust_fan
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  condition: []
+  action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.front_washroom_exhaust_fan
+  mode: single
+- id: '1667518856937'
+  alias: Guest Washroom Light - Auto Off
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - light.keypad_with_dimmer_40_fe_83_main
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 30
+      seconds: 0
+  condition: []
+  action:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id: light.keypad_with_dimmer_40_fe_83_main
+  mode: single
+- id: '1669723280275'
+  alias: Restart Hoymiles Add-On
+  description: Occasionally the add-on times out - this will restart it
+  trigger:
+  - platform: state
+    entity_id:
+    - sensor.solarh_655250_capacitor
+    to: unavailable
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+  condition: []
+  action:
+  - service: hassio.addon_restart
+    data:
+      addon: 44349f66_hoymiles_solardata
+  mode: single
+- id: '1672349972409'
+  alias: Button A on
+  description: Turn on family room lights
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.keypad_with_dimmer_40_fe_83_button_a
+    to: 'on'
+  condition: []
+  action:
+  - type: turn_on
+    device_id: a84a1a1923ae705475e7dd6f7ecb7170
+    entity_id: light.family_room_main_lights
+    domain: light
+    brightness_pct: 75
+  mode: single
+- id: '1672350161457'
+  alias: Button A off
+  description: 'Turn off family room lights '
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.keypad_with_dimmer_40_fe_83_button_a
+    to: 'off'
+  condition: []
+  action:
+  - type: turn_off
+    device_id: a84a1a1923ae705475e7dd6f7ecb7170
+    entity_id: light.family_room_main_lights
+    domain: light
+  mode: single

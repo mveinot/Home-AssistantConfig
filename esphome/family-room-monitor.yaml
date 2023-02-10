@@ -31,4 +31,4 @@ sensor:
       name: "Family Room Temperature"
     humidity:
       name: "Family Room Humidity"
-    update_interval: 60s
+    update_interval: 120s

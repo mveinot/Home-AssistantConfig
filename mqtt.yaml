@@ -1,8 +1,8 @@
 sensor:
   - name: 'Home Electricity Watts'
-    state_topic: 'rtl_433/mars/devices/Efergy-e2CT/60867/current'
+    state_topic: 'rtl_433/ubuntupi/devices/Efergy-e2CT/60867/current'
     unit_of_measurement: W
-    value_template: "{{ value | round(2) * 120 }}"
+    value_template: "{{ (value | float * 120) | round(2) }}"
     device_class: power
 
   - name: 'Bell Jitter'

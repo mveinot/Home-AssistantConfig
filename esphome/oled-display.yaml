@@ -29,6 +29,10 @@ sensor:
     id: pool_temperature
     entity_id: sensor.pool_temperature
     internal: true
+  - platform: homeassistant
+    id: solar_power
+    entity_id: sensor.solarh_655250_real_power
+    internal: true
 
 font:
   - file: 'arial.ttf'
@@ -50,9 +54,13 @@ display:
     reset_pin: D0
     address: 0x3C
     lambda: |-
-      it.printf(64, 0, id(arial24), TextAlign::TOP_CENTER, "Pool");
+      // it.printf(64, 0, id(arial24), TextAlign::TOP_CENTER, "Pool");
 
       // Print outside temperature (from homeassistant sensor)
       if (id(pool_temperature).has_state()) {
-        it.printf(64, 26, id(arial32), TextAlign::TOP_CENTER , "%.1f°C", id(pool_temperature).state);
+        it.printf(64, 0, id(arial32), TextAlign::TOP_CENTER , "%.1f°C", id(pool_temperature).state);
+      }
+
+      if (id(solar_power).has_state()) {
+        it.printf(64, 34, id(arial24), TextAlign::TOP_CENTER , "%.1fW", id(solar_power).state);
       }

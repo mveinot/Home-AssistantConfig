@@ -31,4 +31,4 @@ sensor:
       name: "Server Room Temperature"
     humidity:
       name: "Server Room Humidity"
-    update_interval: 60s
+    update_interval: 120s
