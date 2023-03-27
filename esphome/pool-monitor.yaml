@@ -40,4 +40,4 @@ sensor:
       name: "Office Temperature"
     humidity:
       name: "Office Humidity"
-    update_interval: 60s
+    update_interval: 30s
