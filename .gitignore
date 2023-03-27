@@ -19,3 +19,6 @@ known_devices.yaml
 
 # ignore fonts
 *.ttf
+
+# ignore certificates
+*.pem
