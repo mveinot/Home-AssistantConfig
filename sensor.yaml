@@ -1,9 +1,8 @@
-- platform: integration
-  name: home_electricity_kWh
-  source: sensor.home_electricity_watts
-  round: 3
-  method: left
-  unit_prefix: k
+#- platform: integration
+#  name: home_electricity_kWh
+#  source: sensor.mains_import
+#  round: 3
+#  method: left
 
 - platform: statistics
   name: "24h Upload Average"
@@ -28,3 +27,10 @@
       query: "SELECT (pg_database_size('homeassistant')/1024/1024) as db_size;"
       column: "db_size"
       unit_of_measurement: MB
+
+- platform: template
+  sensors:
+    electricity_kwh_unit_price:
+      friendly_name_template: "NSPI Tariff"
+      value_template: "0.16215"
+      unit_of_measurement: "CAD/kWh"
