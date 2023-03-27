@@ -1,9 +1,3 @@
-#- platform: integration
-#  name: home_electricity_kWh
-#  source: sensor.mains_import
-#  round: 3
-#  method: left
-
 - platform: statistics
   name: "24h Upload Average"
   entity_id: sensor.bell_upload
