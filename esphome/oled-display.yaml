@@ -26,13 +26,29 @@ wifi:
 
 sensor:
   - platform: homeassistant
-    id: pool_temperature
-    entity_id: sensor.pool_temperature
+    id: solar_generated
+    entity_id: sensor.solar_total
     internal: true
   - platform: homeassistant
-    id: solar_power
-    entity_id: sensor.solarh_655250_real_power
-    internal: true
+    id: grid_import
+    entity_id: sensor.mains_import
+    internal: true 
+
+graph:
+  - id: power_graph
+    duration: 1h
+    min_value: 0
+    max_value: 20000
+    width: 128
+    height: 64
+    border: false 
+    traces:
+      - sensor: solar_generated
+        line_thickness: 1
+        line_type: DOTTED
+      - sensor: grid_import
+        line_thickness: 1
+        line_type: SOLID
 
 font:
   - file: 'arial.ttf'
@@ -50,17 +66,8 @@ i2c:
 display:
   - platform: ssd1306_i2c
     model: "SSD1306 128x64"
-    update_interval: 30s
+    update_interval: 10s
     reset_pin: D0
     address: 0x3C
     lambda: |-
-      // it.printf(64, 0, id(arial24), TextAlign::TOP_CENTER, "Pool");
-
-      // Print outside temperature (from homeassistant sensor)
-      if (id(pool_temperature).has_state()) {
-        it.printf(64, 0, id(arial32), TextAlign::TOP_CENTER , "%.1f°C", id(pool_temperature).state);
-      }
-
-      if (id(solar_power).has_state()) {
-        it.printf(64, 34, id(arial24), TextAlign::TOP_CENTER , "%.1fW", id(solar_power).state);
-      }
+      it.graph(0,0, id(power_graph));
