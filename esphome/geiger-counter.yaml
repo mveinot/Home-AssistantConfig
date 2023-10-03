@@ -1,0 +1,133 @@
+esphome:
+  name: geiger-counter
+  friendly_name: Geiger Counter
+
+external_components:
+  - source: github://TheStaticTurtle/esphome_syslog
+    components: [syslog]
+
+esp8266:
+  board: nodemcuv2
+
+# Enable logging
+logger:
+
+syslog:
+  ip_address: "192.168.5.31"
+  port: 514
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "JKUd1wW4/UVk8zBliUpnp9VQ1jdZiJngtckC51zjoPM="
+
+ota:
+  password: "5d1a866076d11bafbc7770070233802d"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  use_address: 192.168.10.204
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Geiger-Counter Fallback Hotspot"
+    password: "mvVtdkldbxPM"
+
+captive_portal:
+
+font:
+  - file: 'arial.ttf'
+    id: nuclear24
+    size: 24
+    
+  - file: 'arial.ttf'
+    id: nuclear32
+    size: 32
+
+globals: 
+  - id: radmon_login
+    type: std::string
+    initial_value: !secret radmon_login
+    restore_value: no
+ 
+  - id: radmon_password
+    type: std::string
+    initial_value: !secret radmon_password
+    restore_value: no
+
+http_request:
+  useragent: esphome/device
+  timeout: 5s
+  id: http
+
+i2c:
+  sda: D1
+  scl: D2
+
+sensor:
+  - platform: pulse_counter
+    icon: mdi:radioactive
+    id: radioactivity_cpm
+    pin: 
+      number: 2 # D4
+      mode: INPUT_PULLUP 
+    name: "Radiation CPM"
+    unit_of_measurement: 'CPM'
+    count_mode:
+      rising_edge: DISABLE
+      falling_edge: INCREMENT
+    on_raw_value:
+      then:
+          - http_request.get:
+              url: !lambda |-
+                return ( (std::string) "http://radmon.org/radmon.php?function=submit&user=" + id(radmon_login) + (std::string) "&password=" + id(radmon_password) + (std::string) "&unit=CPM&value=" + std::to_string(int(x)) ).c_str();
+              on_response:
+                  then:
+                  - lambda: |-
+                     //if (strcmp(id(http).get_string(), "OK") == 0){
+                     if (status_code == 200){ 
+                        id(radmon_send_error).publish_state(false);
+                     }
+                     else{
+                        id(radmon_send_error).publish_state(true);
+                     } 
+      
+  - platform: copy # Reports raduoactivity in μSv/h
+    source_id: radioactivity_cpm
+    name: "Radiation"
+    unit_of_measurement: 'μSv/h'
+    filters:
+      - offset: -12.0 # J305ß Geiger Mueller tube background noise 0.2 pulses / sec x 60 sec = 12 CPM (Counts per Minute)
+      - multiply: 0.00812037037037 # Factor: 0.00812037037037
+      - clamp:
+          min_value: 0
+
+binary_sensor: 
+  - platform: template
+    name: radmon_send_error
+    id: radmon_send_error
+
+#graph:
+#  - id: CPM
+#    duration: 1h
+#    min_value: 0
+#    max_value: 200
+#    width: 128
+#    height: 64
+#    border: true 
+#    traces:
+#      - sensor: radioactivity_cpm
+#        line_thickness: 1
+#        line_type: SOLID
+      
+display:
+  - platform: ssd1306_i2c
+    model: "SSD1306 128x64"
+    update_interval: 30s
+    reset_pin: D0
+    address: 0x3C
+    lambda: |-
+      it.printf(64, 4, id(nuclear32), TextAlign::TOP_CENTER, "%.1f", id(radioactivity_cpm).state);
+      it.printf(64, 36, id(nuclear24), TextAlign::TOP_CENTER, "CPM");
+      //it.graph(0,0, id(CPM));
