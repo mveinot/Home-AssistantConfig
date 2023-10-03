@@ -100,6 +100,7 @@
         data:
           message: Washer cycle start detected
           title: Washer
+        enabled: true
       finishing_hysteresis: 5
       starting_hysteresis: 5
 - id: '1676648187093'
@@ -182,9 +183,11 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.esphome_web_dcd340_storm_alert
-    from: 'off'
-    to: 'on'
+    - sensor.lightning_detector_storm_distance
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 0
   condition: []
   action:
   - service: notify.mobile_app_vics_iphone
