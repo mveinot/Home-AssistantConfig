@@ -18,6 +18,11 @@ recorder:
     event_types:
       - call_service
 
+influxdb:
+  api_version: 1
+  username: !secret influx_username
+  password: !secret influx_password
+  database: !secret influx_database
 # Text to speech
 tts:
   - platform: google_translate
@@ -28,10 +33,10 @@ scene: !include scenes.yaml
 mqtt: !include mqtt.yaml
 sensor: !include sensor.yaml
 
-media_player:
-  - platform: denon
-    host: 192.168.20.123
-    name: Denon 3808CI
+  #media_player:
+  #- platform: denon
+  #  host: 192.168.20.123
+  #  name: Denon 3808CI
 
 frontend:
   themes: !include_dir_merge_named themes
