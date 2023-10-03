@@ -1,0 +1,64 @@
+esphome:
+  name: lightning-detector
+  friendly_name: Lightning Detector
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "XcMf3zvOJZI4SArDRJf+DFIIpN1i9UzoeopVMpA8cpM="
+
+ota:
+  password: "76d9e933a53301e4266262a6bfec8eb0"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  use_address: 192.168.10.205
+  output_power: 10 #8.5-20
+  power_save_mode: LIGHT #HIGH NONE LIGHT
+  fast_connect: true
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Lightning-Detector"
+    password: "O6rLI3Ob2i37"
+
+captive_portal:
+
+spi:
+  clk_pin: GPIO18
+  mosi_pin: GPIO23
+  miso_pin: GPIO19
+
+as3935_spi:
+  cs_pin: GPIO5
+  irq_pin:
+    number: GPIO15
+    mode: INPUT_PULLDOWN
+  indoor: False
+  noise_level: 2
+  spike_rejection: 4      # Default 2
+  lightning_threshold: 1
+  mask_disturber: False
+  div_ratio: 0
+  capacitance: 1
+  watchdog_threshold: 2
+
+sensor:
+  - platform: as3935
+    lightning_energy:
+      name: "Lightning Energy"
+    distance:
+      name: "Storm Distance"
+
+binary_sensor:
+  - platform: as3935
+    name: "Storm Alert"  
