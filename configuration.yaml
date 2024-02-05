@@ -33,10 +33,28 @@ scene: !include scenes.yaml
 mqtt: !include mqtt.yaml
 sensor: !include sensor.yaml
 
-  #media_player:
-  #- platform: denon
-  #  host: 192.168.20.123
-  #  name: Denon 3808CI
+utility_meter:
+  daily_internet_usage_in:
+    unique_id: "f6f3293b-81e9-4427-95ad-ed467f642ee3"
+    source: sensor.internet_usage_in
+    cycle: daily
+  monthly_internet_usage_in:
+    unique_id: "692217cc-cb53-4ade-aaf2-a7810c1dd287"
+    source: sensor.internet_usage_in
+    cycle: monthly
+  daily_internet_usage_out:
+    unique_id: "f967f73e-cd3e-428d-873e-0f11ce703c7e"
+    source: sensor.internet_usage_out
+    cycle: daily
+  monthly_internet_usage_out:
+    unique_id: "00f46f8f-f570-4e3f-a883-7b747d36d47f"
+    source: sensor.internet_usage_out
+    cycle: monthly
+
+media_player:
+  - platform: denon
+    host: 192.168.20.123
+    name: Denon 3808CI
 
 frontend:
   themes: !include_dir_merge_named themes
@@ -45,6 +63,16 @@ http:
   use_x_forwarded_for: true
   trusted_proxies:
     - !secret proxy_ip
+
+input_number:
+  wan_traffic_delta_in:
+    # snmp counter is 32-bit unsigned int
+    min: 0
+    max: 18446744073709551615
+  wan_traffic_delta_out:
+    # snmp counter is 32-bit unsigned int
+    min: 0
+    max: 18446744073709551615
 
 template:
   - sensor:
@@ -58,9 +86,9 @@ template:
       unique_id: laundry_washer_status
       icon: mdi:washing-machine
       state: >
-        {% if states('sensor.washer')|int > 25 %}
+        {% if states('sensor.washer')|int > 300 %}
            Running
-        {% elif states('sensor.washer')|int > 5 %}
+        {% elif states('sensor.washer')|int > 50 %}
            Filling
         {% else %}
            Stopped
@@ -132,17 +160,3 @@ template:
       unit_of_measurement: '$'
       state: "{{(((states('sensor.other_total_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
 
-        #duet3d_printer:
-        #host: 192.168.10.22
-        #name: hypercube
-        #password: none
-        #number_of_tools: 1
-        #bed: true
-        #sensors:
-        #monitored_conditions:
-        #- 'Current State'
-        #- 'Temperatures'
-        #- 'Job Percentage'
-        #- 'Time Elapsed'
-        #- 'Time Remaining'
-        #- 'Position'
