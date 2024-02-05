@@ -36,7 +36,10 @@
       hours: 0
       minutes: 30
       seconds: 0
-  condition: []
+  condition:
+  - condition: state
+    entity_id: input_boolean.enable_front_washroom_automation
+    state: 'on'
   action:
   - service: light.turn_off
     data: {}
@@ -55,7 +58,10 @@
       hours: 0
       minutes: 30
       seconds: 0
-  condition: []
+  condition:
+  - condition: state
+    entity_id: input_boolean.enable_front_washroom_automation
+    state: 'on'
   action:
   - service: switch.turn_off
     data: {}
@@ -72,9 +78,12 @@
     to: 'on'
     for:
       hours: 0
-      minutes: 30
+      minutes: 45
       seconds: 0
-  condition: []
+  condition:
+  - condition: state
+    entity_id: input_boolean.enable_guest_washroom_automation
+    state: 'on'
   action:
   - service: light.turn_off
     data: {}
@@ -88,19 +97,14 @@
     path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
     input:
       power_sensor: sensor.washer
-      starting_threshold: 25
+      starting_threshold: 50
       finishing_threshold: 5
       actions:
       - service: notify.mobile_app_vics_iphone
         data:
           message: Washer cycle has completed
           title: Washer
-      pre_actions:
-      - service: notify.mobile_app_vics_iphone
-        data:
-          message: Washer cycle start detected
-          title: Washer
-        enabled: true
+      pre_actions: []
       finishing_hysteresis: 5
       starting_hysteresis: 5
 - id: '1676648187093'
@@ -129,7 +133,7 @@
       finishing_threshold: 20
       starting_hysteresis: 5
 - id: '1683247135769'
-  alias: Office lights
+  alias: Office lights on
   description: ''
   trigger:
   - platform: time
@@ -194,3 +198,136 @@
     data:
       message: 'Lightning '
   mode: single
+- id: '1697058234249'
+  alias: Office lights off
+  description: ''
+  trigger:
+  - platform: time
+    at: '16:30:00'
+  condition: []
+  action:
+  - type: turn_off
+    device_id: dd7fd84bd3a962790d9801dac4fa22fb
+    entity_id: bb52b494ce3a018028759b914a26f1e3
+    domain: light
+  mode: single
+- id: '1697241814928'
+  alias: 'Turn off Front decorative lights '
+  description: ''
+  trigger:
+  - platform: time
+    at: 02:00:00
+  condition: []
+  action:
+  - type: turn_off
+    device_id: c9f911ae71529f83ceffc4b1ac06d494
+    entity_id: 5d8f83bc7d4685f564e60eb7c81a26a2
+    domain: light
+  - type: turn_off
+    device_id: 76fa849c2440764efaf4ae53e97c1121
+    entity_id: 48daa5444c62309be68111d06ea9d4e1
+    domain: switch
+  mode: single
+- id: '1697242091947'
+  alias: 'Turn on Front decorative lights '
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunset
+    offset: 0
+  condition: []
+  action:
+  - type: turn_on
+    device_id: c9f911ae71529f83ceffc4b1ac06d494
+    entity_id: 5d8f83bc7d4685f564e60eb7c81a26a2
+    domain: light
+  - device_id: c9f911ae71529f83ceffc4b1ac06d494
+    domain: select
+    entity_id: 4dfba050af17852cc39434ab4f00d760
+    type: select_first
+  - type: turn_on
+    device_id: 76fa849c2440764efaf4ae53e97c1121
+    entity_id: 48daa5444c62309be68111d06ea9d4e1
+    domain: switch
+    enabled: false
+  mode: single
+- id: '1706893400957'
+  alias: Door Activated Server Light On
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.server_room_monitor_server_room_door
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+  condition: []
+  action:
+  - service: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 100
+    target:
+      entity_id: light.server_room_main_lights
+  mode: single
+- id: '1706893459258'
+  alias: Door Activated Server Light Off
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.server_room_monitor_server_room_door
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+  condition: []
+  action:
+  - service: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.server_room_main_lights
+  mode: single
+
+# https://community.home-assistant.io/t/snmp-bandwidth-monitor/7122
+# https://community.home-assistant.io/t/snmp-bandwidth-monitor-using-statistics-and-a-utility-meter/176971
+- alias: "Monitor Inbound Internet Traffic"
+  id: "244f20ae-8cc6-4442-b3aa-0336763508f8"
+  trigger:
+    platform: state
+    entity_id: sensor.snmp_wan_in
+  action:
+    - service: input_number.set_value
+      data:
+        entity_id: input_number.wan_traffic_delta_in
+        value: >-
+          {# safe delta catering for wrap-around of a 32-bit unsigned int (snmp counter is 32-bit unsigned int) #}
+          {# basically taking 2's complement #}
+          {% set from = trigger.from_state.state | int(0) %}
+          {% set to = trigger.to_state.state | int(0) %}
+          {% set traffic_delta = (to - from) if (to >= from) else (4294967295 - from + to + 1) %}
+          {% set time_delta = as_timestamp(trigger.to_state.last_updated) - as_timestamp(trigger.from_state.last_updated) %}
+          {{ (traffic_delta * 8) / time_delta }}
+
+- alias: "Monitor Outbound Internet Traffic"
+  id: "719b1fd6-bfc1-40b3-bf0e-5a07cff11aea"
+  trigger:
+    platform: state
+    entity_id: sensor.snmp_wan_out
+  action:
+    - service: input_number.set_value
+      data:
+        entity_id: input_number.wan_traffic_delta_out
+        value: >-
+          {# safe delta catering for wrap-around of a 32-bit unsigned int (snmp counter is 32-bit unsigned int) #}
+          {# basically taking 2's complement #}
+          {% set from = trigger.from_state.state | int(0) %}
+          {% set to = trigger.to_state.state | int(0) %}
+          {% set traffic_delta = (to - from) if (to >= from) else (4294967295 - from + to + 1) %}
+          {% set time_delta = as_timestamp(trigger.to_state.last_updated) - as_timestamp(trigger.from_state.last_updated) %}
+          {{ (traffic_delta * 8) / time_delta }}
+
