@@ -2,6 +2,10 @@ esphome:
   name: lightning-detector
   friendly_name: Lightning Detector
 
+external_components:
+  - source: github://TheStaticTurtle/esphome_syslog
+    components: [syslog]
+
 esp32:
   board: esp32dev
   framework:
@@ -9,6 +13,10 @@ esp32:
 
 # Enable logging
 logger:
+
+syslog:
+  ip_address: "192.168.5.31"
+  port: 514
 
 # Enable Home Assistant API
 api:
@@ -45,12 +53,14 @@ as3935_spi:
     mode: INPUT_PULLDOWN
   indoor: False
   noise_level: 2
-  spike_rejection: 4      # Default 2
-  lightning_threshold: 1
+  spike_rejection: 5      # Default 2
+  lightning_threshold: 9
   mask_disturber: False
-  div_ratio: 0
-  capacitance: 1
+  div_ratio: 16
+  capacitance: 8
   watchdog_threshold: 2
+  tune_antenna: False
+  calibration: True
 
 sensor:
   - platform: as3935
@@ -59,6 +69,15 @@ sensor:
     distance:
       name: "Storm Distance"
 
+  - platform: dht
+    pin: GPIO17
+    model: AM2302
+    temperature:
+      name: "Outside Temperature"
+    humidity:
+      name: "Outside Humidity"
+    update_interval: 60s
+
 binary_sensor:
   - platform: as3935
-    name: "Storm Alert"  
+    name: "Storm Alert"
