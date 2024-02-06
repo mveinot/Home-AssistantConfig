@@ -1,0 +1,85 @@
+- sensor:
+  - name: 'Hot Tub Temperature'
+    unique_id: hot_tub_temp
+    unit_of_measurement: '°C'
+    state: "{{ state_attr('climate.hot_tub_heater', 'current_temperature') }}"
+    state_class: measurement
+    device_class: temperature
+  - name: 'Washer Status'
+    unique_id: laundry_washer_status
+    icon: mdi:washing-machine
+    state: >
+      {% if states('sensor.washer')|int > 300 %}
+         Running
+      {% elif states('sensor.washer')|int > 50 %}
+         Filling
+      {% else %}
+         Stopped
+      {% endif %}
+  - name: 'Dryer Status'
+    unique_id: laundry_dryer_status
+    icon: mdi:washing-machine
+    state: >
+      {% if states('sensor.dryer')|int > 50 %}
+         Running
+      {% elif states('sensor.dryer')|int > 5 %}
+         Cooldown
+      {% else %}
+         Stopped
+      {% endif %}
+  - name: 'Server Cost'
+    unique_id: server_operating_cost
+    icon: mdi:cash
+    unit_of_measurement: '$'
+    state: "{{(((states('sensor.servers_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
+  - name: 'Washer Cost'
+    unique_id: washer_operating_cost
+    icon: mdi:cash
+    unit_of_measurement: '$'
+    state: "{{(((states('sensor.washer_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
+  - name: 'Dryer Cost'
+    unique_id: dryer_operating_cost
+    icon: mdi:cash
+    unit_of_measurement: '$'
+    state: "{{(((states('sensor.dryer_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
+  - name: 'Hot Water Cost'
+    unique_id: hot_water_operating_cost
+    icon: mdi:cash
+    unit_of_measurement: '$'
+    state: "{{(((states('sensor.water_heater_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
+  - name: 'Water Pump Cost'
+    unique_id: water_pump_operating_cost
+    icon: mdi:cash
+    unit_of_measurement: '$'
+    state: "{{(((states('sensor.water_pump_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
+  - name: 'Main Heat Pump Cost'
+    unique_id: main_heat_pump_operating_cost
+    icon: mdi:cash
+    unit_of_measurement: '$'
+    state: "{{(((states('sensor.heat_pumps_main_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
+  - name: 'Master Bedroom Heat Pump Cost'
+    unique_id: mb_heat_pump_operating_cost
+    icon: mdi:cash
+    unit_of_measurement: '$'
+    state: "{{(((states('sensor.heat_pump_mb_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
+  - name: 'Hot Tub Cost'
+    unique_id: hot_tub_operating_cost
+    icon: mdi:cash
+    unit_of_measurement: '$'
+    state: "{{(((states('sensor.hot_tub_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
+  - name: 'Range Cost'
+    unique_id: range_operating_cost
+    icon: mdi:cash
+    unit_of_measurement: '$'
+    state: "{{(((states('sensor.range_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
+  - name: 'Office Cost'
+    unique_id: office_operating_cost
+    icon: mdi:cash
+    unit_of_measurement: '$'
+    state: "{{(((states('sensor.office_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
+  - name: 'Unmetered Devices Cost'
+    unique_id: misc_operating_cost
+    icon: mdi:cash
+    unit_of_measurement: '$'
+    state: "{{(((states('sensor.other_total_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
+
