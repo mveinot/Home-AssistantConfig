@@ -23,17 +23,12 @@ frontend:
 
 http:
   use_x_forwarded_for: true
+  ip_ban_enabled: true
+  login_attempts_threshold: 5
+  cors_allowed_origins: 
+    - https://homeassistant.mvgrafx.net
   trusted_proxies:
     - !secret proxy_ip
-
-influxdb:
-  api_version: 1
-  username: !secret influx_username
-  password: !secret influx_password
-  database: !secret influx_database
-# Text to speech
-tts:
-  - platform: google_translate
 
 automation: !include automations.yaml
 script: !include scripts.yaml
