@@ -83,3 +83,64 @@
     unit_of_measurement: '$'
     state: "{{(((states('sensor.other_total_wh')| float(0) * states('sensor.electricity_kwh_unit_price')| float(0))) / 1000) | round(2) }}"
 
+- sensor:
+  - unique_id: internet_total_usage_down
+    name: 'Internet Total Usage (down)'
+    state: >
+      {{ (
+        (states("sensor.snmp_wan_in")|int)
+        / (1024*1024)
+        ) | round(2)
+      }}
+    state_class: total_increasing
+    device_class: data_size
+    unit_of_measurement: 'MiB'
+    icon: mdi:chart-bell-curve-cumulative
+
+  - unique_id: internet_total_usage_up
+    name: 'Internet Total Usage (up)'
+    state: >
+      {{ (
+        (states("sensor.snmp_wan_out")|int)
+        / (1024*1024)
+        ) | round(2)
+      }}
+    state_class: total_increasing
+    device_class: data_size
+    unit_of_measurement: 'MiB'
+    icon: mdi:chart-bell-curve-cumulative
+
+
+- trigger:
+  - platform: state
+    entity_id: sensor.snmp_wan_in
+  sensor:
+    - unique_id: internet_speed_down
+      name: 'Internet Speed Down'
+      state: >
+        {{ (
+          ( (trigger.to_state.state | int - trigger.from_state.state | int) * 8 / 1000000 )
+          / ( as_timestamp(trigger.to_state.last_updated) - as_timestamp(trigger.from_state.last_updated))
+          ) | round(2)
+        }}
+      state_class: measurement
+      device_class: data_rate
+      unit_of_measurement: 'Mbit/s'
+      icon: mdi:download
+
+- trigger:
+  - platform: state
+    entity_id: sensor.snmp_wan_out
+  sensor:
+  - unique_id: internet_speed_up
+    name: 'Internet Speed Up'
+    state: >
+      {{ (
+        ( (trigger.to_state.state | int - trigger.from_state.state | int) * 8 / 1000000 )
+        / ( as_timestamp(trigger.to_state.last_updated) - as_timestamp(trigger.from_state.last_updated))
+        ) | round(2)
+      }}
+    state_class: measurement
+    device_class: data_rate
+    unit_of_measurement: 'Mbit/s'
+    icon: mdi:upload
