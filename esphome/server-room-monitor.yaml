@@ -35,11 +35,11 @@ sensor:
       name: "Server Room Humidity"
     update_interval: 120s
 
-binary_sensor:
-  - platform: gpio
-    pin:
-      number: D3
-      mode:
-        input: true
-        pullup: true
-    name: "Server Room Door"
+#binary_sensor:
+#  - platform: gpio
+#    pin:
+#      number: D3
+#      mode:
+#        input: true
+#        pullup: true
+#    name: "Server Room Door"
