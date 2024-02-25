@@ -47,7 +47,7 @@
       entity_id: light.switchlinc_dimmer_1d_4a_dc
   mode: single
 - id: '1665764761019'
-  alias: Automatically turn off front washroom fan
+  alias: front-washroom.fan.auto-off
   description: ''
   trigger:
   - platform: state
@@ -69,7 +69,7 @@
       entity_id: switch.front_washroom_exhaust_fan
   mode: single
 - id: '1667518856937'
-  alias: Guest Washroom Light - Auto Off
+  alias: guest-washroom.light.auto-off
   description: ''
   trigger:
   - platform: state
@@ -108,7 +108,7 @@
       finishing_hysteresis: 5
       starting_hysteresis: 5
 - id: '1676648187093'
-  alias: Dryer cycle completed
+  alias: laundry.dryer.cycle-complete
   description: Send a notification when dryer power drops below 5W
   use_blueprint:
     path: sbyx/notify-or-do-something-when-an-appliance-like-a-dishwasher-or-washing-machine-finishes.yaml
@@ -144,8 +144,8 @@
     state: 'on'
   action:
   - type: turn_on
-    device_id: dd7fd84bd3a962790d9801dac4fa22fb
-    entity_id: light.switchlinc_dimmer_2f_cd_b1
+    device_id: e22babe121846f66115b86b635fa8235
+    entity_id: 621feb955001ec091397f4c1bee47865
     domain: light
     brightness_pct: 15
   mode: single
@@ -207,8 +207,8 @@
   condition: []
   action:
   - type: turn_off
-    device_id: dd7fd84bd3a962790d9801dac4fa22fb
-    entity_id: bb52b494ce3a018028759b914a26f1e3
+    device_id: e22babe121846f66115b86b635fa8235
+    entity_id: 621feb955001ec091397f4c1bee47865
     domain: light
   mode: single
 - id: '1697241814928'
@@ -252,7 +252,7 @@
     enabled: false
   mode: single
 - id: '1706893400957'
-  alias: Door Activated Server Light On
+  alias: server-room.lights.door-activated [on]
   description: ''
   trigger:
   - platform: state
@@ -273,7 +273,7 @@
       entity_id: light.server_room_main_lights
   mode: single
 - id: '1706893459258'
-  alias: Door Activated Server Light Off
+  alias: server-room.lights.door-activated [off]
   description: ''
   trigger:
   - platform: state
@@ -292,42 +292,108 @@
     target:
       entity_id: light.server_room_main_lights
   mode: single
-
-# https://community.home-assistant.io/t/snmp-bandwidth-monitor/7122
-# https://community.home-assistant.io/t/snmp-bandwidth-monitor-using-statistics-and-a-utility-meter/176971
-- alias: "Monitor Inbound Internet Traffic"
-  id: "244f20ae-8cc6-4442-b3aa-0336763508f8"
+- id: '1707271189445'
+  alias: Keypad control recessed lights on
+  description: ''
   trigger:
-    platform: state
-    entity_id: sensor.snmp_wan_in
+  - platform: state
+    entity_id:
+    - switch.keypad_with_dimmer_40_fe_83_button_a
+    from: 'off'
+    to: 'on'
+  condition: []
   action:
-    - service: input_number.set_value
-      data:
-        entity_id: input_number.wan_traffic_delta_in
-        value: >-
-          {# safe delta catering for wrap-around of a 32-bit unsigned int (snmp counter is 32-bit unsigned int) #}
-          {# basically taking 2's complement #}
-          {% set from = trigger.from_state.state | int(0) %}
-          {% set to = trigger.to_state.state | int(0) %}
-          {% set traffic_delta = (to - from) if (to >= from) else (4294967295 - from + to + 1) %}
-          {% set time_delta = as_timestamp(trigger.to_state.last_updated) - as_timestamp(trigger.from_state.last_updated) %}
-          {{ (traffic_delta * 8) / time_delta }}
-
-- alias: "Monitor Outbound Internet Traffic"
-  id: "719b1fd6-bfc1-40b3-bf0e-5a07cff11aea"
+  - service: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 100
+    target:
+      entity_id: light.family_room_main_lights
+  mode: single
+- id: '1707271294541'
+  alias: Keypad control recessed lights off
+  description: ''
   trigger:
-    platform: state
-    entity_id: sensor.snmp_wan_out
+  - platform: state
+    entity_id:
+    - switch.keypad_with_dimmer_40_fe_83_button_a
+    from: 'on'
+    to: 'off'
+  condition: []
   action:
-    - service: input_number.set_value
-      data:
-        entity_id: input_number.wan_traffic_delta_out
-        value: >-
-          {# safe delta catering for wrap-around of a 32-bit unsigned int (snmp counter is 32-bit unsigned int) #}
-          {# basically taking 2's complement #}
-          {% set from = trigger.from_state.state | int(0) %}
-          {% set to = trigger.to_state.state | int(0) %}
-          {% set traffic_delta = (to - from) if (to >= from) else (4294967295 - from + to + 1) %}
-          {% set time_delta = as_timestamp(trigger.to_state.last_updated) - as_timestamp(trigger.from_state.last_updated) %}
-          {{ (traffic_delta * 8) / time_delta }}
-
+  - service: light.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: light.family_room_main_lights
+  mode: single
+- id: '1707950316618'
+  alias: Turn on Office Dimly
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - switch.ceiling_lights_button_a
+    from:
+    to: 'on'
+  condition: []
+  action:
+  - delay:
+      hours: 0
+      minutes: 0
+      seconds: 0
+      milliseconds: 500
+  - service: switch.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: switch.ceiling_lights_button_a
+  - service: light.turn_on
+    target:
+      device_id: e22babe121846f66115b86b635fa8235
+    data:
+      brightness_pct: 15
+  mode: single
+- id: '1708042561159'
+  alias: Office lighting by presence [on]
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.presence_sensor_presence
+    to: 'on'
+    from:
+  condition:
+  - condition: device
+    type: is_off
+    device_id: e22babe121846f66115b86b635fa8235
+    entity_id: 621feb955001ec091397f4c1bee47865
+    domain: light
+  action:
+  - service: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 20
+    target:
+      device_id: e22babe121846f66115b86b635fa8235
+  mode: single
+- id: '1708044110159'
+  alias: Office lighting by presence [off]
+  description: ''
+  trigger:
+  - platform: state
+    entity_id:
+    - binary_sensor.presence_sensor_presence
+    to: 'off'
+    from:
+    for:
+      hours: 0
+      minutes: 1
+      seconds: 0
+  condition: []
+  action:
+  - service: light.turn_off
+    target:
+      device_id: e22babe121846f66115b86b635fa8235
+    data: {}
+  mode: single
