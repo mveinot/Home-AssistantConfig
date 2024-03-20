@@ -1,0 +1,282 @@
+substitutions:
+# Change the disp_name to something you want  
+  disp_name: ESPHome Power Monitor
+# Interval of how often the power is updated
+  update_time: 10s
+# Current Transformers:
+#  20A/25mA SCT-006: 11143
+#  30A/1V SCT-013-030: 8650
+#  50A/1V SCT-013-050: 15420
+#  50A/16.6mA SCT-010: 41334
+#  80A/26.6mA SCT-010: 41660
+#  100A/50ma SCT-013-000: 27518
+#  120A/40mA: SCT-016: 41787
+#  200A/100mA SCT-024: 27518
+#  200A/50mA SCT-024: 55036
+  current_cal: '27518'
+# Jameco 9VAC Transformer: 
+#  For meter versions: 
+#  >= v1.3: 7305
+  voltage_cal: '7305'
+  ct1name: downstairs_front_rooms
+  ct2name: upstairs_front_rooms
+  ct3name: dishwasher
+  ct4name: master_bathroom_hallway
+  ct5name: master_bedroom
+  ct6name: fridge
+
+esphome:
+  name: auxiliary-energy-monitor
+  friendly_name: ${disp_name}
+
+esp32:
+  board: nodemcu-32s
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+  level: ERROR
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "8c4PPujxdJzODn3UeC2NegP74hYhltWg63Gps9GS+Z8="
+
+ota:
+  password: "72e99c72984b95d51c73e100582cf477"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  use_address: 192.168.10.208
+
+web_server:
+  port: 80
+
+spi:
+  clk_pin: 18
+  miso_pin: 19
+  mosi_pin: 23
+
+sensor:
+  - platform: uptime
+    name: "Uptime Sensor"
+    id: uptime_sensor
+    entity_category: diagnostic
+    internal: True
+
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: diagnostic
+    internal: True
+
+# Reports the WiFi signal strength in %
+  - platform: copy
+    source_id: wifi_signal_db
+    name: "WiFi Strength"
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: diagnostic
+
+#IC1
+  - platform: atm90e32
+    cs_pin: 5
+    phase_a:
+      voltage:
+        name: ${disp_name} Volts
+        id: ic1Volts
+        accuracy_decimals: 1
+      #current:
+      #  name: ${ct1name}
+      #  id: ct1Amps
+      power:
+        name: ${ct1name}
+        id: ct1Watts
+        unit_of_measurement: "W"
+      gain_voltage: ${voltage_cal}
+      gain_ct: ${current_cal}
+    phase_b:
+      #current:
+      #  name: ${ct2name}
+      #  id: ct2Amps
+      power:
+        name: ${ct2name}
+        id: ct2Watts
+        unit_of_measurement: "W"
+      gain_voltage: ${voltage_cal}
+      gain_ct: ${current_cal}
+    phase_c:
+      #current:
+      #  name: ${ct3name}
+      #  id: ct3Amps
+      power:
+        name: ${ct3name}
+        id: ct3Watts
+        unit_of_measurement: "W"
+      gain_voltage: ${voltage_cal}
+      gain_ct: ${current_cal}
+    frequency:
+      name: ${disp_name} Freq A
+    line_frequency: 60Hz
+    gain_pga: 1X
+    update_interval: ${update_time}
+#IC2
+  - platform: atm90e32
+    cs_pin: 4
+    phase_a:
+#this voltage is only needed if monitoring 2 voltages
+#      voltage:
+#        name: ${disp_name} Volts B
+#        id: ic2Volts
+#        accuracy_decimals: 1
+      #current:
+      #  name: ${ct4name}
+      #  id: ct4Amps
+      power:
+        name: ${ct4name}
+        id: ct4Watts
+        unit_of_measurement: "W"
+      gain_voltage: ${voltage_cal}
+      gain_ct: ${current_cal}
+    phase_b:
+      #current:
+      #  name: ${ct5name}
+      #  id: ct5Amps
+      power:
+        name: ${ct5name}
+        id: ct5Watts
+        unit_of_measurement: "W"
+      gain_voltage: ${voltage_cal}
+      gain_ct: ${current_cal}
+    phase_c:
+      #current:
+      #  name: ${ct6name}
+      #  id: ct6Amps
+      power:
+        name: ${ct6name}
+        id: ct6Watts
+        unit_of_measurement: "W"
+      gain_voltage: ${voltage_cal}
+      gain_ct: ${current_cal}
+    frequency:
+      name: ${disp_name} Freq B
+    line_frequency: 60Hz
+    gain_pga: 1X
+    update_interval: ${update_time}
+
+  - platform: total_daily_energy
+    name: ${ct1name}.wh
+    power_id: ct1Watts
+    unit_of_measurement: 'Wh'
+    state_class: total_increasing
+    device_class: energy
+    accuracy_decimals: 3
+  - platform: total_daily_energy
+    name: ${ct2name}.wh
+    power_id: ct2Watts
+    unit_of_measurement: 'Wh'
+    state_class: total_increasing
+    device_class: energy
+    accuracy_decimals: 3
+  - platform: total_daily_energy
+    name: ${ct3name}.wh
+    power_id: ct3Watts
+    unit_of_measurement: 'Wh'
+    state_class: total_increasing
+    device_class: energy
+    accuracy_decimals: 3
+  - platform: total_daily_energy
+    name: ${ct4name}.wh
+    power_id: ct4Watts
+    unit_of_measurement: 'Wh'
+    state_class: total_increasing
+    device_class: energy
+    accuracy_decimals: 3
+  - platform: total_daily_energy
+    name: ${ct5name}.wh
+    power_id: ct5Watts
+    unit_of_measurement: 'Wh'
+    state_class: total_increasing
+    device_class: energy
+    accuracy_decimals: 3
+  - platform: total_daily_energy
+    name: ${ct6name}.wh
+    power_id: ct6Watts
+    unit_of_measurement: 'Wh'
+    state_class: total_increasing
+    device_class: energy
+    accuracy_decimals: 3
+
+binary_sensor:
+  - platform: status
+    name: "Status"
+    entity_category: diagnostic
+
+switch:
+  - platform: restart
+    name: ${disp_name} Restart  
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      entity_category: diagnostic
+    ssid:
+      name: "Connected SSID"
+      entity_category: diagnostic
+    mac_address:
+      name: "Mac Address"
+      entity_category: diagnostic
+
+  - platform: template
+    name: 'Device Last Restart'
+    id: device_last_restart
+    icon: mdi:clock
+    entity_category: diagnostic
+    internal: True
+#    device_class: timestamp
+
+  #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
+  - platform: template
+    name: "Device Uptime"
+    entity_category: diagnostic
+    lambda: |-
+      int seconds = (id(uptime_sensor).state);
+      int days = seconds / (24 * 3600);
+      seconds = seconds % (24 * 3600);
+      int hours = seconds / 3600;
+      seconds = seconds % 3600;
+      int minutes = seconds /  60;
+      seconds = seconds % 60;
+      if ( days > 3650 ) {
+        return { "Starting up" };
+      } else if ( days ) {
+        return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else if ( hours ) {
+        return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else if ( minutes ) {
+        return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else {
+        return { (String(seconds) +"s").c_str() };
+      }
+    icon: mdi:clock-start
+
+time:
+  - platform: sntp
+    id: sntp_time
+  # Change sync interval from default 5min to 6 hours
+    update_interval: 360min
+  # Publish the time the device was last restarted
+    on_time_sync:
+      then:
+        # Update last restart time, but only once.
+        - if:
+            condition:
+              lambda: 'return id(device_last_restart).state == "";'
+            then:
+              - text_sensor.template.publish:
+                  id: device_last_restart
+                  state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
