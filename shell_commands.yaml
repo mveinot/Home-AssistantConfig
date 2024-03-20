@@ -1,0 +1,1 @@
+lock_mac_mini: 'ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=.ssh/known_hosts -i .ssh/id_rsa vmark@192.168.5.101 "pmset displaysleepnow"'
