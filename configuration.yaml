@@ -2,6 +2,12 @@
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 
+logger:
+  default: error
+    #  logs:
+    #    homeassistant.components.shell_command: debug
+
+
 recorder:
   db_url: !secret psql_string
   db_retry_wait: 15
@@ -39,4 +45,5 @@ template: !include template.yaml
 utility_meter: !include utility_meter.yaml
 input_number: !include input_number.yaml
 media_player: !include media_player.yaml
+shell_command: !include shell_commands.yaml
 
