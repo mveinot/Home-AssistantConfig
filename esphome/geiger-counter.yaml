@@ -1,6 +1,9 @@
+substitutions:
+  disp_name: Geiger Counter
+
 esphome:
   name: geiger-counter
-  friendly_name: Geiger Counter
+  friendly_name: ${disp_name}
 
 external_components:
   - source: github://TheStaticTurtle/esphome_syslog
@@ -102,11 +105,35 @@ sensor:
       - multiply: 0.00812037037037 # Factor: 0.00812037037037
       - clamp:
           min_value: 0
+  - platform: uptime
+    name: "Uptime Sensor"
+    id: uptime_sensor
+    entity_category: diagnostic
+    internal: True
+
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: diagnostic
+    internal: True
+
+# Reports the WiFi signal strength in %
+  - platform: copy
+    source_id: wifi_signal_db
+    name: "WiFi Strength"
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: diagnostic
 
 binary_sensor: 
   - platform: template
     name: radmon_send_error
     id: radmon_send_error
+  - platform: status
+    name: "Status"
+    entity_category: diagnostic
 
 #graph:
 #  - id: CPM
@@ -131,3 +158,65 @@ display:
       it.printf(64, 4, id(nuclear32), TextAlign::TOP_CENTER, "%.1f", id(radioactivity_cpm).state);
       it.printf(64, 36, id(nuclear24), TextAlign::TOP_CENTER, "CPM");
       //it.graph(0,0, id(CPM));
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      entity_category: diagnostic
+    ssid:
+      name: "Connected SSID"
+      entity_category: diagnostic
+    mac_address:
+      name: "Mac Address"
+      entity_category: diagnostic
+
+  - platform: template
+    name: 'Device Last Restart'
+    id: device_last_restart
+    icon: mdi:clock
+    entity_category: diagnostic
+    internal: True
+#    device_class: timestamp
+
+  #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
+  - platform: template
+    name: "Device Uptime"
+    entity_category: diagnostic
+    lambda: |-
+      int seconds = (id(uptime_sensor).state);
+      int days = seconds / (24 * 3600);
+      seconds = seconds % (24 * 3600);
+      int hours = seconds / 3600;
+      seconds = seconds % 3600;
+      int minutes = seconds /  60;
+      seconds = seconds % 60;
+      if ( days > 3650 ) {
+        return { "Starting up" };
+      } else if ( days ) {
+        return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else if ( hours ) {
+        return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else if ( minutes ) {
+        return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
+      } else {
+        return { (String(seconds) +"s").c_str() };
+      }
+    icon: mdi:clock-start
+
+time:
+  - platform: sntp
+    id: sntp_time
+  # Change sync interval from default 5min to 6 hours
+    update_interval: 360min
+  # Publish the time the device was last restarted
+    on_time_sync:
+      then:
+        # Update last restart time, but only once.
+        - if:
+            condition:
+              lambda: 'return id(device_last_restart).state == "";'
+            then:
+              - text_sensor.template.publish:
+                  id: device_last_restart
+                  state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
