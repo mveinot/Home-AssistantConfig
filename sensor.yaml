@@ -1,18 +1,18 @@
-- platform: statistics
-  name: '24h Upload Average'
-  entity_id: sensor.bell_upload
-  sampling_size: 20
-  state_characteristic: mean
-  max_age:
-    hours: 24
+#- platform: statistics
+#  name: '24h Upload Average'
+#  entity_id: sensor.bell_upload
+#  sampling_size: 20
+#  state_characteristic: mean
+#  max_age:
+#    hours: 24
 
-- platform: statistics
-  name: '24h Download Average'
-  entity_id: sensor.bell_download
-  sampling_size: 20
-  state_characteristic: mean
-  max_age:
-    hours: 24
+#- platform: statistics
+#  name: '24h Download Average'
+#  entity_id: sensor.bell_download
+#  sampling_size: 20
+#  state_characteristic: mean
+#  max_age:
+#    hours: 24
 
 - platform: template
   sensors:
