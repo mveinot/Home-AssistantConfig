@@ -31,21 +31,33 @@ captive_portal:
     
 # Example configuration entry
 dallas:
-  - pin: 4
+  - pin: 14
+
+i2c:
+  id: bus_a
+  sda: 4
+  scl: 5
+  #scan: true
 
 sensor:
   - platform: dallas
     address: 0x18041655af9aff28
     name: "Pool Temperature"
-    
-  - platform: dht
-    pin: D5
-    model: AM2302
+
+  - platform: sht4x
+    id: env_sensor
+    i2c_id: bus_a
     temperature:
-      name: "Office Temperature"
+      name: "Temperature"
+      id: office_temp
     humidity:
-      name: "Office Humidity"
-    update_interval: 30s
+      name: "Relative Humidity"
+      id: office_rel_hum
+
+  - platform: absolute_humidity
+    name: "Absolute Humidity"
+    temperature: office_temp
+    humidity: office_rel_hum
 
   - platform: uptime
     name: "Uptime Sensor"
