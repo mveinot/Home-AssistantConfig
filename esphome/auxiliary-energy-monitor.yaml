@@ -24,6 +24,8 @@ substitutions:
   ct4name: master_bathroom_hallway
   ct5name: master_bedroom
   ct6name: fridge
+  project_name: CircuitSetup_Power_Monitor
+  version: 1.0.1
 
 esphome:
   name: auxiliary-energy-monitor
