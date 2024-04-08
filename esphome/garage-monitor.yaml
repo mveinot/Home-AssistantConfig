@@ -31,13 +31,23 @@ wifi:
 
 captive_portal:
   
-dallas:
-  - pin: GPIO4
+i2c:
+  id: bus_a
+  sda: 4
+  scl: 5
+  #scan: true
 
 sensor:
-  - platform: dallas
-    address: 0xe50115c23fdbff28
-    name: "Garage Temperature"
+  - platform: sht4x
+    id: env_sensor
+    i2c_id: bus_a
+    temperature:
+      name: "Temperature"
+      id: garage_temperature
+    humidity:
+      name: "Humidity"
+      id: garage_humidity
+
   - platform: wifi_signal
     name: ${disp_name} WiFi
     update_interval: 120s
