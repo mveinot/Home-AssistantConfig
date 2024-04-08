@@ -201,7 +201,7 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.server_room_monitor_server_room_door
+    - binary_sensor.door_sensor_contact
     to: 'on'
     for:
       hours: 0
@@ -222,7 +222,7 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.server_room_monitor_server_room_door
+    - binary_sensor.door_sensor_contact
     to: 'off'
     for:
       hours: 0
@@ -363,7 +363,7 @@
     - sensor.water_heater
     for:
       hours: 0
-      minutes: 30
+      minutes: 45
       seconds: 0
     above: 2000
   condition: []
@@ -415,4 +415,13 @@
     data:
       message: 'Replace batteries '
       title: Leak Sensor
+  mode: single
+- id: '1711584978796'
+  alias: lights.all.turn_off
+  description: ''
+  trigger: []
+  condition: []
+  action:
+  - service: light.turn_off
+    entity_id: all
   mode: single
