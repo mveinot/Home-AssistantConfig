@@ -18,6 +18,11 @@ internet_usage_down_daily:
   name: "Daily Internet Usage (down)"
   source: sensor.internet_total_usage_down
   cycle: daily
+internet_usage_up_daily:
+  unique_id: "8e73ac96-4d86-498b-8fcc-0a1f16f8cceb"
+  name: "Daily Internet Usage (up)"
+  source: sensor.internet_total_usage_up
+  cycle: daily
 internet_usage_down:
   unique_id: "692217cc-cb53-4ade-aaf2-a7810c1dd287"
   name: "Monthly Internet Usage (down)"
