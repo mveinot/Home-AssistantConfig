@@ -10,6 +10,8 @@ external_components:
     components: [syslog]
 
 esp8266:
+  #framework:
+  #  version: 3.0.2
   board: nodemcuv2
 
 # Enable logging
@@ -25,7 +27,8 @@ api:
     key: "JKUd1wW4/UVk8zBliUpnp9VQ1jdZiJngtckC51zjoPM="
 
 ota:
-  password: "5d1a866076d11bafbc7770070233802d"
+  - platform: esphome
+    password: "5d1a866076d11bafbc7770070233802d"
 
 wifi:
   ssid: !secret wifi_ssid
@@ -60,6 +63,7 @@ globals:
     restore_value: no
 
 http_request:
+  verify_ssl: false
   useragent: esphome/device
   timeout: 5s
   id: http
@@ -67,6 +71,8 @@ http_request:
 i2c:
   sda: D1
   scl: D2
+  frequency: 800kHz
+  #scan: true
 
 sensor:
   - platform: pulse_counter
@@ -88,8 +94,7 @@ sensor:
               on_response:
                   then:
                   - lambda: |-
-                     //if (strcmp(id(http).get_string(), "OK") == 0){
-                     if (status_code == 200){ 
+                     if (response->status_code == 200){ 
                         id(radmon_send_error).publish_state(false);
                      }
                      else{
@@ -131,22 +136,11 @@ binary_sensor:
   - platform: template
     name: radmon_send_error
     id: radmon_send_error
+    entity_category: diagnostic
+    
   - platform: status
     name: "Status"
     entity_category: diagnostic
-
-#graph:
-#  - id: CPM
-#    duration: 1h
-#    min_value: 0
-#    max_value: 200
-#    width: 128
-#    height: 64
-#    border: true 
-#    traces:
-#      - sensor: radioactivity_cpm
-#        line_thickness: 1
-#        line_type: SOLID
       
 display:
   - platform: ssd1306_i2c
@@ -158,6 +152,10 @@ display:
       it.printf(64, 4, id(nuclear32), TextAlign::TOP_CENTER, "%.1f", id(radioactivity_cpm).state);
       it.printf(64, 36, id(nuclear24), TextAlign::TOP_CENTER, "CPM");
       //it.graph(0,0, id(CPM));
+
+switch:
+  - platform: restart
+    name: ${disp_name} Restart
 
 text_sensor:
   - platform: wifi_info

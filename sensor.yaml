@@ -18,13 +18,42 @@
   sensors:
     electricity_kwh_unit_price:
       friendly_name_template: 'NSPI Tariff'
-      value_template: 0.17547
+      value_template: 0.17703
       unit_of_measurement: 'CAD/kWh'
     last_lightning_event:
       unique_id: lightning_last_event
       friendly_name_template: 'Last Lightning Event'
       value_template: "{{ states['sensor.lightning_detector_storm_distance'].last_changed }}"
       device_class: timestamp
+    outside_wind_cardinal:
+      unique_id: 579e27a7-b6a5-4f46-8180-a98be3859665
+      value_template: >
+        {% set dir = states('sensor.outside_wind_direction')|float %}
+        {% if 11.25 < dir <= 33.75 %} NNE
+        {% elif 33.75 < dir <= 56.25 %} NE
+        {% elif 56.25 < dir <= 78.75 %} ENE
+        {% elif 78.75 < dir <= 101.25 %} E
+        {% elif 101.25 < dir <= 123.75 %} ESE
+        {% elif 123.75 < dir <= 146.25 %} SE
+        {% elif 146.25 < dir <= 168.75 %} SSE
+        {% elif 168.75 < dir <= 191.25 %} S
+        {% elif 191.25 < dir <= 213.75 %} SSW
+        {% elif 213.75 < dir <= 236.25 %} SW
+        {% elif 236.25 < dir <= 258.75 %} WSW
+        {% elif 258.75 < dir <= 281.25 %} W
+        {% elif 281.25 < dir <= 303.75 %} WNW
+        {% elif 303.75 < dir <= 326.25 %} NW
+        {% elif 326.25 < dir <= 348.75 %} NNW
+        {% else %} N
+        {% endif %}
+    battery_ok:
+      unique_id: "5cee369c-ee04-4cb2-8f9d-248fd80f6c2d"
+      value_template: >
+        {% set bat_ok = states('sensor.battery') %}
+        {% if bat_ok == '1' %} OK
+        {% else %} Replace
+        {% endif %}
+
 
 - platform: snmp
   name: snmp_wan_in

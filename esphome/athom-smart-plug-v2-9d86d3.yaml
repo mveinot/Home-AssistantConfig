@@ -11,6 +11,8 @@ api:
   encryption:
     key: szw9iWMxybb3FGPTI0r0sVS61in/geh478qV72F7hEo=
 
+ota:
+  - platform: esphome
 
 wifi:
   ssid: !secret wifi_ssid

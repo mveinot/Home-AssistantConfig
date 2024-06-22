@@ -22,6 +22,8 @@ syslog:
   port: 514
 
 web_server:
+  js_url: https://oi.esphome.io/v3/www.js
+  version: 3
   port: 80
 
 # Enable Home Assistant API
@@ -30,7 +32,8 @@ api:
     key: "XcMf3zvOJZI4SArDRJf+DFIIpN1i9UzoeopVMpA8cpM="
 
 ota:
-  password: "76d9e933a53301e4266262a6bfec8eb0"
+  - platform: esphome
+    password: "76d9e933a53301e4266262a6bfec8eb0"
 
 wifi:
   ssid: !secret wifi_ssid
@@ -87,6 +90,10 @@ sensor:
       name: "Temperature"
     humidity:
       name: "Humidity"
+    update_interval: 60s
+
+  - platform: esp32_hall
+    name: "ESP32 Hall Sensor"
     update_interval: 60s
 
   - platform: uptime

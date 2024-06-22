@@ -1,20 +1,37 @@
 sensor:
-  - name: 'Bell Jitter'
-    state_topic: 'bandwidth/bell-aliant'
-    unit_of_measurement: 'ms'
-    value_template: "{{value_json.jitter}}"
-
-  - name: 'Bell Ping'
-    state_topic: 'bandwidth/bell-aliant'
-    unit_of_measurement: 'ms'
-    value_template: "{{value_json.ping}}"
-
-  - name: 'Bell Upload'
-    state_topic: 'bandwidth/bell-aliant'
-    unit_of_measurement: 'Mbps'
-    value_template: "{{ (value_json.upload | int / 1048576) | round(0) }}"
-
-  - name: 'Bell Download'
-    state_topic: 'bandwidth/bell-aliant'
-    unit_of_measurement: 'Mbps'
-    value_template: "{{ (value_json.download | int / 1048576) | round(0) }}"
+  - name: Outside Temperature
+    unique_id: "f013ec6d-e016-497b-91b5-21cecc93209b"
+    device_class: temperature
+    unit_of_measurement: '°C'
+    value_template: '{{ ((value_json.temperature_F - 32) * 5/9) | round(1) }}'
+    state_topic: rtl_433/Acurite-5n1/3870/msg56
+    json_attributes_topic: rtl_433/Acurite-5n1/3870/msg56
+  - name: Outside Humidity
+    unique_id: "61bf863e-5012-434d-8aa8-3d79dfa9e57d"
+    device_class: humidity
+    unit_of_measurement: '%'
+    value_template: '{{ value_json.humidity }}'
+    state_topic: rtl_433/Acurite-5n1/3870/msg56
+  - name: Outside Wind Speed
+    unique_id: "2cb4ed38-6c89-47ff-9784-5031f56bada5"
+    unit_of_measurement: 'km/h'
+    value_template: '{{ value_json.wind_avg_km_h  | round(1) }}'
+    state_topic: rtl_433/Acurite-5n1/3870/msg49
+    json_attributes_topic: rtl_433/Acurite-5n1/3870/msg49
+  - name: Outside Wind Direction
+    unique_id: "11cc3721-0339-4e44-aa71-289c7424ae6c"
+    unit_of_measurement: '°'
+    value_template: '{{ value_json.wind_dir_deg  | round(1) }}'
+    state_topic: rtl_433/Acurite-5n1/3870/msg49
+    json_attributes_topic: rtl_433/Acurite-5n1/3870/msg49
+  - name: Rainfall
+    unique_id: "cc57ee34-bae4-45d2-83b3-5401cf6d501d"
+    unit_of_measurement: 'mm'
+    value_template: '{{ value_json.rain_in * 25.4  | round(1) }}'
+    state_topic: rtl_433/Acurite-5n1/3870/msg49
+    json_attributes_topic: rtl_433/Acurite-5n1/3870/msg49
+  - name: Battery
+    unique_id: "41500c3c-948a-46ed-a77d-67aaf72a632c"
+    value_template: '{{ value_json.battery_ok }}'
+    state_topic: rtl_433/Acurite-5n1/3870/msg49
+    json_attributes_topic: rtl_433/Acurite-5n1/3870/msg49

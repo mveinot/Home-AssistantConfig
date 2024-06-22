@@ -45,7 +45,8 @@ api:
     key: "8c4PPujxdJzODn3UeC2NegP74hYhltWg63Gps9GS+Z8="
 
 ota:
-  password: "72e99c72984b95d51c73e100582cf477"
+  - platform: esphome
+    password: "72e99c72984b95d51c73e100582cf477"
 
 wifi:
   ssid: !secret wifi_ssid
@@ -53,6 +54,8 @@ wifi:
   use_address: 192.168.10.208
 
 web_server:
+  js_url: https://oi.esphome.io/v3/www.js
+  version: 3
   port: 80
 
 spi:

@@ -33,3 +33,15 @@ internet_usage_up:
   name: "Monthly Internet Usage (up)"
   source: sensor.internet_total_usage_up
   cycle: monthly
+
+daily_rainfall:
+  unique_id: "21f64524-dd78-4657-8cea-e0f8220c8c28"
+  name: "Daily Rainfall"
+  source: sensor.rainfall
+  cycle: daily
+monthly_rainfall:
+  unique_id: "16635835-108a-43bf-9775-cf5f6daa4768"
+  name: "Monthly Rainfall"
+  source: sensor.rainfall
+  cycle: monthly
+

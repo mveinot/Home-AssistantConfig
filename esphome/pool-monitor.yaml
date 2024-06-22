@@ -15,7 +15,8 @@ logger:
 api:
 
 ota:
-  password: "0e71951840966d7a85fd01518507dbf9"
+  - platform: esphome
+    password: "0e71951840966d7a85fd01518507dbf9"
 
 wifi:
   ssid: !secret wifi_ssid
@@ -30,34 +31,45 @@ wifi:
 captive_portal:
     
 # Example configuration entry
-dallas:
-  - pin: 14
+one_wire:
+  - platform: gpio
+    pin: 14
 
 i2c:
   id: bus_a
   sda: 4
   scl: 5
-  #scan: true
 
 sensor:
-  - platform: dallas
+  - platform: dallas_temp
     address: 0x18041655af9aff28
     name: "Pool Temperature"
 
-  - platform: sht4x
-    id: env_sensor
+  - platform: aht10
     i2c_id: bus_a
+    variant: AHT20
     temperature:
-      name: "Temperature"
       id: office_temp
+      name: "Temperature"
     humidity:
-      name: "Relative Humidity"
       id: office_rel_hum
+      name: "Relative Humidity"
+    update_interval: 60s
 
-  - platform: absolute_humidity
-    name: "Absolute Humidity"
-    temperature: office_temp
-    humidity: office_rel_hum
+  - platform: ens160_i2c
+    i2c_id: bus_a
+    eco2:
+      name: "eCO2"
+    tvoc:
+      name: "Total VOC"
+    aqi:
+      id: office_aq_index
+      name: "AQI"
+    update_interval: 60s
+    address: 0x53
+    compensation:
+      temperature: office_temp
+      humidity: office_rel_hum
 
   - platform: uptime
     name: "Uptime Sensor"
@@ -86,6 +98,10 @@ binary_sensor:
     name: "Status"
     entity_category: diagnostic 
 
+switch:
+  - platform: restart
+    name: ${disp_name} Restart
+
 text_sensor:
   - platform: wifi_info
     ip_address:
@@ -105,6 +121,18 @@ text_sensor:
     entity_category: diagnostic
     internal: True
 #    device_class: timestamp
+
+  - platform: template
+    name: "ENS160 Air Quality Rating"
+    lambda: |-
+      switch ( (int) (id(office_aq_index).state) ) {
+        case 1: return {"Excellent"};
+        case 2: return {"Good"};
+        case 3: return {"Moderate"};
+        case 4: return {"Poor"};
+        case 5: return {"Unhealthy"};
+        default: return {"Not Available"};
+      }
 
   #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
   - platform: template

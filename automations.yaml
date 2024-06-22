@@ -201,7 +201,7 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.door_sensor_contact
+    - binary_sensor.server_room_door_sensor_contact
     to: 'on'
     for:
       hours: 0
@@ -222,7 +222,7 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.door_sensor_contact
+    - binary_sensor.server_room_door_sensor_contact
     to: 'off'
     for:
       hours: 0
@@ -297,6 +297,15 @@
       device_id: e22babe121846f66115b86b635fa8235
     data:
       brightness_pct: 15
+  - service: light.turn_on
+    metadata: {}
+    data:
+      rgb_color:
+      - 255
+      - 255
+      - 255
+    target:
+      device_id: 4ca2146b55d50c33072f44ba92ad9821
   mode: single
 - id: '1708042561159'
   alias: light.office.presence
@@ -304,13 +313,13 @@
   trigger:
   - platform: state
     entity_id:
-    - binary_sensor.presence_sensor_presence
+    - binary_sensor.office_presence_sensor_presence
     to: 'on'
     from:
     id: office-occupied
   - platform: state
     entity_id:
-    - binary_sensor.presence_sensor_presence
+    - binary_sensor.office_presence_sensor_presence
     from:
     to: 'off'
     for:
@@ -341,7 +350,7 @@
           - 255
           brightness: 255
         target:
-          entity_id: light.led_strip
+          device_id: 4ca2146b55d50c33072f44ba92ad9821
     - conditions:
       - condition: trigger
         id:
@@ -362,8 +371,8 @@
     entity_id:
     - sensor.water_heater
     for:
-      hours: 0
-      minutes: 45
+      hours: 1
+      minutes: 30
       seconds: 0
     above: 2000
   condition: []
@@ -424,4 +433,20 @@
   action:
   - service: light.turn_off
     entity_id: all
+  mode: single
+- id: '1624586003695'
+  alias: RTL433 MQTT message_type Demuxer
+  description: Split rtl_433/# signals into msg topics, if message_type exists
+  trigger:
+  - platform: mqtt
+    topic: rtl_433/+/+
+  condition:
+  - condition: template
+    value_template: '{{ trigger.payload_json.message_type != null }}'
+  action:
+  - service: mqtt.publish
+    data:
+      payload: '{{trigger.payload}}'
+      topic: rtl_433/{{trigger.payload_json.model or "UnknownModel"}}/{{trigger.payload_json.id
+        or "UnknownId"}}/msg{{trigger.payload_json.message_type}}
   mode: single

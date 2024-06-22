@@ -9,8 +9,8 @@ logger:
 
 
 recorder:
-  db_url: !secret psql_string
-  db_retry_wait: 15
+  #  db_url: !secret psql_string
+  #  db_retry_wait: 15
   exclude:
     domains:
       - automation
@@ -39,9 +39,10 @@ http:
 automation: !include automations.yaml
 script: !include scripts.yaml
 scene: !include scenes.yaml
-#mqtt: !include mqtt.yaml
+mqtt: !include mqtt.yaml
 sensor: !include sensor.yaml
 template: !include template.yaml
+#switch: !include switch.yaml
 utility_meter: !include utility_meter.yaml
 input_number: !include input_number.yaml
 media_player: !include media_player.yaml

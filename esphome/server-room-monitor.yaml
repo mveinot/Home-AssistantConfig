@@ -65,6 +65,10 @@ binary_sensor:
     name: "Status"
     entity_category: diagnostic 
 
+switch:
+  - platform: restart
+    name: ${disp_name} Restart
+
 text_sensor:
   - platform: wifi_info
     ip_address:

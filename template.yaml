@@ -144,3 +144,22 @@
     device_class: data_rate
     unit_of_measurement: 'Mbit/s'
     icon: mdi:upload
+
+- button:
+  - unique_id: 'ledfx_start_stop'
+    name: >-
+      {% if states('media_player.ledfx_192_168_10_108_media_player') == 'paused' %}
+        Start LEDfx
+      {% else %}
+        Stop LEDfx
+      {% endif %}
+    icon: >-
+      {% if states('media_player.ledfx_192_168_10_108_media_player') == 'paused' %}
+        mdi:led-strip-variant-off
+      {% else %}
+        mdi:led-strip-variant
+      {% endif %}
+    press:
+      service: media_player.media_play_pause
+      target:
+        entity_id: media_player.ledfx_192_168_10_108_media_player
