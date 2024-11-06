@@ -9,8 +9,6 @@ logger:
 
 
 recorder:
-  #  db_url: !secret psql_string
-  #  db_retry_wait: 15
   exclude:
     domains:
       - automation
@@ -47,4 +45,12 @@ utility_meter: !include utility_meter.yaml
 input_number: !include input_number.yaml
 media_player: !include media_player.yaml
 shell_command: !include shell_commands.yaml
-
+command_line:
+  - binary_sensor:
+      unique_id: "83037ee7-d31a-496c-b6d3-49132ec870ac"
+      command: 'response=$(curl -LIk -m 3 http://192.168.5.32:32400/web/index.html -o /dev/null -w "%{http_code}\n" -s); test "$response" -eq 200 && echo "OFF" || echo "ON"'
+      name: "Plex Server HTTPS Status"
+      device_class: connectivity
+      payload_on: "ON"
+      payload_off: "OFF"
+      scan_interval: 60
