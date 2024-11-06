@@ -53,6 +53,9 @@ wifi:
   password: !secret wifi_password
   use_address: 192.168.10.208
 
+bluetooth_proxy:
+  active: true
+  
 web_server:
   js_url: https://oi.esphome.io/v3/www.js
   version: 3
