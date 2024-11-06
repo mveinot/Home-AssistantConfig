@@ -120,7 +120,7 @@
   - service: switch.turn_off
     data: {}
     target:
-      entity_id: switch.on_off_outlet_57_87_64_bottom
+      device_id: 76fa849c2440764efaf4ae53e97c1121
   mode: single
 - id: '1684106995925'
   alias: Turn on pool pump
@@ -136,7 +136,7 @@
   - service: switch.turn_on
     data: {}
     target:
-      entity_id: switch.on_off_outlet_57_87_64_bottom
+      device_id: 76fa849c2440764efaf4ae53e97c1121
   mode: single
 - id: '1693015446407'
   alias: alert.lightning
@@ -167,10 +167,6 @@
     device_id: c9f911ae71529f83ceffc4b1ac06d494
     entity_id: 5d8f83bc7d4685f564e60eb7c81a26a2
     domain: light
-  - type: turn_off
-    device_id: 76fa849c2440764efaf4ae53e97c1121
-    entity_id: 48daa5444c62309be68111d06ea9d4e1
-    domain: switch
   mode: single
 - id: '1697242091947'
   alias: light.front_yard.led_string.on
@@ -310,15 +306,14 @@
 - id: '1708042561159'
   alias: light.office.presence
   description: ''
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - binary_sensor.office_presence_sensor_presence
     to: 'on'
     from:
     id: office-occupied
-  - platform: state
-    entity_id:
+    trigger: state
+  - entity_id:
     - binary_sensor.office_presence_sensor_presence
     from:
     to: 'off'
@@ -327,40 +322,59 @@
       minutes: 1
       seconds: 0
     id: office-vacant
-  condition: []
-  action:
+    trigger: state
+  conditions: []
+  actions:
   - choose:
     - conditions:
       - condition: trigger
         id:
         - office-occupied
       sequence:
-      - service: light.turn_on
-        metadata: {}
+      - metadata: {}
         data:
           brightness_pct: 20
         target:
           device_id: e22babe121846f66115b86b635fa8235
-      - service: light.turn_on
-        metadata: {}
+        action: light.turn_on
+      - metadata: {}
         data:
           rgb_color:
-          - 255
-          - 255
+          - 0
+          - 0
           - 255
           brightness: 255
         target:
           device_id: 4ca2146b55d50c33072f44ba92ad9821
+        action: light.turn_on
+      - if:
+        - condition: numeric_state
+          entity_id: sensor.pool_monitor_temperature
+          above: 28
+        then:
+        - type: turn_on
+          device_id: a36db20fbe381d6a63674e7044c23bd2
+          entity_id: 9ee6ecc8fe99d7bcf60bc21122e16f79
+          domain: switch
     - conditions:
       - condition: trigger
         id:
         - office-vacant
       sequence:
-      - service: light.turn_off
-        metadata: {}
+      - metadata: {}
         data: {}
         target:
           area_id: office
+        action: light.turn_off
+      - type: turn_off
+        device_id: a36db20fbe381d6a63674e7044c23bd2
+        entity_id: 9ee6ecc8fe99d7bcf60bc21122e16f79
+        domain: switch
+      - metadata: {}
+        data: {}
+        target:
+          device_id: 4ca2146b55d50c33072f44ba92ad9821
+        action: light.turn_off
   mode: single
 - id: '1709656644999'
   alias: alert.hot_water_tank_duration
@@ -449,4 +463,24 @@
       payload: '{{trigger.payload}}'
       topic: rtl_433/{{trigger.payload_json.model or "UnknownModel"}}/{{trigger.payload_json.id
         or "UnknownId"}}/msg{{trigger.payload_json.message_type}}
+  mode: single
+- id: '1730340042753'
+  alias: Plex down alert
+  description: ''
+  triggers:
+  - trigger: state
+    entity_id:
+    - binary_sensor.plex_server_https_status
+    from: 'on'
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 2
+      seconds: 0
+  conditions: []
+  actions:
+  - action: notify.mobile_app_vics_iphone
+    metadata: {}
+    data:
+      message: Plex server down
   mode: single
