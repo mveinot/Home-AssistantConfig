@@ -1,6 +1,6 @@
 substitutions:
   name: athom-smart-plug-v2-9d86d3
-  friendly_name: Smart Plug V2 9d86d3
+  friendly_name: Docker Server Power
 packages:
   Athom_Technology.Smart_Plug_V2: github://athom-tech/athom-configs/athom-smart-plug-v2.yaml
 esphome:
@@ -10,9 +10,6 @@ esphome:
 api:
   encryption:
     key: szw9iWMxybb3FGPTI0r0sVS61in/geh478qV72F7hEo=
-
-ota:
-  - platform: esphome
 
 wifi:
   ssid: !secret wifi_ssid
