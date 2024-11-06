@@ -17,12 +17,12 @@
 - platform: template
   sensors:
     electricity_kwh_unit_price:
-      friendly_name_template: 'NSPI Tariff'
+      friendly_name_template: "NSPI Tariff"
       value_template: 0.17703
-      unit_of_measurement: 'CAD/kWh'
+      unit_of_measurement: "CAD/kWh"
     last_lightning_event:
       unique_id: lightning_last_event
-      friendly_name_template: 'Last Lightning Event'
+      friendly_name_template: "Last Lightning Event"
       value_template: "{{ states['sensor.lightning_detector_storm_distance'].last_changed }}"
       device_class: timestamp
     outside_wind_cardinal:
@@ -54,30 +54,42 @@
         {% else %} Replace
         {% endif %}
 
-
 - platform: snmp
   name: snmp_wan_in
   host: 192.168.5.1
   community: public
   version: 2c
-  baseoid: 1.3.6.1.2.1.31.1.1.1.6.3  # ifInOctets.14
+  baseoid: 1.3.6.1.2.1.31.1.1.1.6.3 # ifInOctets.14
   unit_of_measurement: octets
 - platform: snmp
   name: snmp_wan_out
   host: 192.168.5.1
   community: public
   version: 2c
-  baseoid: 1.3.6.1.2.1.31.1.1.1.10.3  # ifOutOctets.14
+  baseoid: 1.3.6.1.2.1.31.1.1.1.10.3 # ifOutOctets.14
   unit_of_measurement: octets
 - platform: statistics
   unique_id: internet_speed_down_mean
-  name: 'Internet Speed Down (mean)'
+  name: "Internet Speed Down (mean)"
   entity_id: sensor.internet_speed_down
   state_characteristic: mean
   sampling_size: 20
 - platform: statistics
   unique_id: internet_speed_up_mean
-  name: 'Internet Speed Up (mean)'
+  name: "Internet Speed Up (mean)"
   entity_id: sensor.internet_speed_up
   state_characteristic: mean
   sampling_size: 20
+
+- platform: apparent_temperature
+  unique_id: 6503cdd3-1e5f-4a1d-98ba-acf498284d58
+  name: "Outside Feels Like Temperature"
+  source:
+    - sensor.outside_temperature
+    - sensor.outside_humidity
+- platform: apparent_temperature
+  unique_id: 22703303-b5c5-44b4-a522-a943cab0e6e6
+  name: "Dining Feels Like Temperature"
+  source:
+    - sensor.mysa_e81ba4_current_temperature
+    - sensor.mysa_e81ba4_current_humidity
