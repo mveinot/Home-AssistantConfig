@@ -484,3 +484,27 @@
     data:
       message: Plex server down
   mode: single
+- id: '1731781634628'
+  alias: Shower Fan Auto-Off
+  description: Turn the shower fan off after 20 min
+  triggers:
+  - trigger: state
+    entity_id:
+    - switch.master_bathroom_shower_fan
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 1
+  conditions: []
+  actions:
+  - delay:
+      hours: 0
+      minutes: 20
+      seconds: 0
+      milliseconds: 0
+  - target:
+      entity_id: switch.master_bathroom_shower_fan
+    action: switch.turn_off
+    data: {}
+  mode: single
