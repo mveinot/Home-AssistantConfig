@@ -1,0 +1,111 @@
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+
+logger:
+
+binary_sensor:
+  - platform: status
+    name: "Status"
+    entity_category: diagnostic
+
+sensor:
+  - platform: wifi_signal
+    name: ${friendly_name} WiFi
+    update_interval: 120s
+  - platform: uptime
+    name: "Uptime Sensor"
+    id: uptime_sensor
+    entity_category: diagnostic
+    internal: True
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    id: wifi_signal_db
+    update_interval: 60s
+    entity_category: diagnostic
+    internal: True
+  # Reports the WiFi signal strength in %
+  - platform: copy
+    source_id: wifi_signal_db
+    name: "WiFi Strength"
+    filters:
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: diagnostic
+
+text_sensor:    
+  - platform: wifi_info
+    ip_address:
+      name: "IP Address"
+      entity_category: diagnostic
+    ssid:
+      name: "Connected SSID"
+      entity_category: diagnostic
+    mac_address:
+      name: "Mac Address"
+      entity_category: diagnostic
+  - platform: template
+    name: 'Device Last Restart'
+    id: device_last_restart
+    icon: mdi:clock
+    entity_category: diagnostic
+    internal: True
+  - platform: template
+    name: "Uptime"
+    entity_category: diagnostic
+    lambda: |-
+      int seconds = static_cast<int>(id(uptime_sensor).state);
+      int days = seconds / (24 * 3600);
+      seconds = seconds % (24 * 3600);
+      int hours = seconds / 3600;
+      seconds = seconds % 3600;
+      int minutes = seconds / 60;
+      seconds = seconds % 60;
+
+      if (days > 3650) {
+        return std::string("Starting up");
+      }
+
+      std::string result;
+
+      if (days) {
+        result = std::to_string(days) + "d " +
+                 std::to_string(hours) + "h " +
+                 std::to_string(minutes) + "m " +
+                 std::to_string(seconds) + "s";
+      } else if (hours) {
+        result = std::to_string(hours) + "h " +
+                 std::to_string(minutes) + "m " +
+                 std::to_string(seconds) + "s";
+      } else if (minutes) {
+        result = std::to_string(minutes) + "m " +
+                 std::to_string(seconds) + "s";
+      } else {
+        result = std::to_string(seconds) + "s";
+      }
+
+      return result;
+    icon: mdi:clock-start
+
+switch:
+  - platform: restart
+    name: ${friendly_name} Restart  
+    
+  #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
+
+time:
+  - platform: sntp
+    id: sntp_time
+  # Change sync interval from default 5min to 6 hours
+    update_interval: 360min
+  # Publish the time the device was last restarted
+    on_time_sync:
+      then:
+        # Update last restart time, but only once.
+        - if:
+            condition:
+              lambda: 'return id(device_last_restart).state == "";'
+            then:
+              - text_sensor.template.publish:
+                  id: device_last_restart
+                  state: !lambda 'return id(sntp_time).now().strftime("%a %d %b %Y - %I:%M:%S %p");'
