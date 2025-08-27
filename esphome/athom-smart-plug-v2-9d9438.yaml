@@ -1,12 +1,15 @@
 substitutions:
-  name: athom-smart-plug-v2-9d9438
+  name: athom-smart-plug-v2
   friendly_name: Plex Server Power
+  hide_energy_sensor: "true"
+  early_pin_init: "true"
+  log_level: "INFO"
+  timezone: "America/Halifax"
+
 packages:
-  Athom_Technology.Smart_Plug_V2: github://athom-tech/athom-configs/athom-smart-plug-v2.yaml
-esphome:
-  name: ${name}
-  name_add_mac_suffix: false
-  friendly_name: ${friendly_name}
+  - !include common/common8266.yaml
+  - !include common/athom-smart-plug-v2.yaml
+  
 api:
   encryption:
     key: 6n0cJ/ssJGazeQzTU+sSRxdQO3qTA/lFrNteAAaV1Ww=

@@ -5,21 +5,13 @@ esphome:
   name: outside-monitor
   friendly_name: ${disp_name}
 
-external_components:
-  - source: github://TheStaticTurtle/esphome_syslog
-    components: [syslog]
-
 esp32:
   board: esp32dev
   framework:
-    type: arduino
+    type: esp-idf
 
 # Enable logging
 logger:
-
-syslog:
-  ip_address: "192.168.5.31"
-  port: 514
 
 web_server:
   js_url: https://oi.esphome.io/v3/www.js
@@ -92,10 +84,6 @@ sensor:
       name: "Humidity"
     update_interval: 60s
 
-  - platform: esp32_hall
-    name: "ESP32 Hall Sensor"
-    update_interval: 60s
-
   - platform: uptime
     name: "Uptime Sensor"
     id: uptime_sensor
@@ -151,27 +139,40 @@ text_sensor:
 
   #  Creates a sensor of the uptime of the device, in formatted days, hours, minutes and seconds
   - platform: template
-    name: "Device Uptime"
+    name: "Uptime"
     entity_category: diagnostic
     lambda: |-
-      int seconds = (id(uptime_sensor).state);
+      int seconds = static_cast<int>(id(uptime_sensor).state);
       int days = seconds / (24 * 3600);
       seconds = seconds % (24 * 3600);
       int hours = seconds / 3600;
       seconds = seconds % 3600;
-      int minutes = seconds /  60;
+      int minutes = seconds / 60;
       seconds = seconds % 60;
-      if ( days > 3650 ) {
-        return { "Starting up" };
-      } else if ( days ) {
-        return { (String(days) +"d " + String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else if ( hours ) {
-        return { (String(hours) +"h " + String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else if ( minutes ) {
-        return { (String(minutes) +"m "+ String(seconds) +"s").c_str() };
-      } else {
-        return { (String(seconds) +"s").c_str() };
+
+      if (days > 3650) {
+        return std::string("Starting up");
       }
+
+      std::string result;
+
+      if (days) {
+        result = std::to_string(days) + "d " +
+                 std::to_string(hours) + "h " +
+                 std::to_string(minutes) + "m " +
+                 std::to_string(seconds) + "s";
+      } else if (hours) {
+        result = std::to_string(hours) + "h " +
+                 std::to_string(minutes) + "m " +
+                 std::to_string(seconds) + "s";
+      } else if (minutes) {
+        result = std::to_string(minutes) + "m " +
+                 std::to_string(seconds) + "s";
+      } else {
+        result = std::to_string(seconds) + "s";
+      }
+
+      return result;
     icon: mdi:clock-start
 
 time:

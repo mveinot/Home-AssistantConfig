@@ -1,0 +1,37 @@
+learn_code:
+  sequence:
+  - action: remote.learn_command
+    data:
+      device: Front Room TV
+      command_type: ir
+      command: Volume Down
+    target:
+      device_id: a3d727ba7ab11c946c7025e0efbb0926
+  alias: Learn Code
+  description: ''
+front_room_tv_volup:
+  sequence:
+  - action: remote.send_command
+    data:
+      device: Front Room TV
+      num_repeats: 1
+      delay_secs: 0.4
+      hold_secs: 0
+      command: Volume Up
+    target:
+      device_id: a3d727ba7ab11c946c7025e0efbb0926
+  alias: Front Room TV VolUp
+  description: ''
+front_room_tv_voldown:
+  sequence:
+  - action: remote.send_command
+    data:
+      device: Front Room TV
+      num_repeats: 1
+      delay_secs: 0.4
+      hold_secs: 0
+      command: Volume Down
+    target:
+      device_id: a3d727ba7ab11c946c7025e0efbb0926
+  alias: Front Room TV VolDown
+  description: ''

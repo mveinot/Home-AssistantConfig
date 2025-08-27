@@ -20,49 +20,27 @@
     target:
       entity_id: light.switchlinc_dimmer_1d_4a_dc
   mode: single
-- id: '1665764761019'
-  alias: front-washroom.fan.auto-off
-  description: ''
-  trigger:
-  - platform: state
-    entity_id:
-    - switch.front_washroom_exhaust_fan
-    to: 'on'
-    for:
-      hours: 0
-      minutes: 30
-      seconds: 0
-  condition:
-  - condition: state
-    entity_id: input_boolean.enable_front_washroom_automation
-    state: 'on'
-  action:
-  - service: switch.turn_off
-    data: {}
-    target:
-      entity_id: switch.front_washroom_exhaust_fan
-  mode: single
 - id: '1667518856937'
-  alias: guest-washroom.light.auto-off
+  alias: auto_off.guest_washroom.light
   description: ''
-  trigger:
-  - platform: state
-    entity_id:
+  triggers:
+  - entity_id:
     - light.keypad_with_dimmer_40_fe_83_main
     to: 'on'
     for:
       hours: 0
       minutes: 45
       seconds: 0
-  condition:
+    trigger: state
+  conditions:
   - condition: state
     entity_id: input_boolean.enable_guest_washroom_automation
     state: 'on'
-  action:
-  - service: light.turn_off
-    data: {}
+  actions:
+  - data: {}
     target:
       entity_id: light.keypad_with_dimmer_40_fe_83_main
+    action: light.turn_off
   mode: single
 - id: '1676647760080'
   alias: alert.laundry.washer.cycle_complete
@@ -74,10 +52,8 @@
       starting_threshold: 50
       finishing_threshold: 5
       actions:
-      - service: notify.mobile_app_vics_iphone
-        data:
-          message: Washer cycle has completed
-          title: Washer
+      - action: notify.mobile_app_vics_iphone
+        data: {}
       pre_actions: []
       finishing_hysteresis: 5
       starting_hysteresis: 5
@@ -89,20 +65,11 @@
     input:
       power_sensor: sensor.dryer
       actions:
-      - service: notify.mobile_app_vics_iphone
-        data:
+      - data:
           message: Dryer cycle has completed
           title: Dryer
-      pre_actions:
-      - service: notify.mobile_app_vics_iphone
-        data:
-          message: Dryer cycle start detected
-          title: Dryer
-      - service: input_select.select_option
-        data:
-          option: Running
-        target:
-          entity_id: input_select.dryer
+        action: notify.mobile_app_vics_iphone
+      pre_actions: []
       starting_threshold: 50
       finishing_threshold: 20
       starting_hysteresis: 5
@@ -158,11 +125,11 @@
 - id: '1697241814928'
   alias: 'Turn off Front decorative lights '
   description: ''
-  trigger:
-  - platform: time
-    at: 02:00:00
-  condition: []
-  action:
+  triggers:
+  - at: 02:00:00
+    trigger: time
+  conditions: []
+  actions:
   - type: turn_off
     device_id: c9f911ae71529f83ceffc4b1ac06d494
     entity_id: 5d8f83bc7d4685f564e60eb7c81a26a2
@@ -171,12 +138,12 @@
 - id: '1697242091947'
   alias: light.front_yard.led_string.on
   description: ''
-  trigger:
-  - platform: sun
-    event: sunset
+  triggers:
+  - event: sunset
     offset: 0
-  condition: []
-  action:
+    trigger: sun
+  conditions: []
+  actions:
   - type: turn_on
     device_id: c9f911ae71529f83ceffc4b1ac06d494
     entity_id: 5d8f83bc7d4685f564e60eb7c81a26a2
@@ -185,11 +152,6 @@
     domain: select
     entity_id: 4dfba050af17852cc39434ab4f00d760
     type: select_first
-  - type: turn_on
-    device_id: 76fa849c2440764efaf4ae53e97c1121
-    entity_id: 48daa5444c62309be68111d06ea9d4e1
-    domain: switch
-    enabled: false
   mode: single
 - id: '1706893400957'
   alias: server-room.lights.door-activated [on]
@@ -347,15 +309,6 @@
         target:
           device_id: 4ca2146b55d50c33072f44ba92ad9821
         action: light.turn_on
-      - if:
-        - condition: numeric_state
-          entity_id: sensor.pool_monitor_temperature
-          above: 28
-        then:
-        - type: turn_on
-          device_id: a36db20fbe381d6a63674e7044c23bd2
-          entity_id: 9ee6ecc8fe99d7bcf60bc21122e16f79
-          domain: switch
     - conditions:
       - condition: trigger
         id:
@@ -366,10 +319,6 @@
         target:
           area_id: office
         action: light.turn_off
-      - type: turn_off
-        device_id: a36db20fbe381d6a63674e7044c23bd2
-        entity_id: 9ee6ecc8fe99d7bcf60bc21122e16f79
-        domain: switch
       - metadata: {}
         data: {}
         target:
@@ -419,11 +368,10 @@
       title: Leak Sensor
   mode: single
 - id: '1710281136140'
-  alias: alert.server_room.leak_senssor.battery_low
+  alias: alert.server_room.leak_sensor.battery_low
   description: ''
-  trigger:
+  triggers:
   - type: bat_low
-    platform: device
     device_id: 33cff89280cf18d572d1c4d782a92e67
     entity_id: 4971e3f4f730e5e9339f39520e01a376
     domain: binary_sensor
@@ -431,13 +379,14 @@
       hours: 0
       minutes: 0
       seconds: 30
-  condition: []
-  action:
-  - service: notify.mobile_app_vics_iphone
-    metadata: {}
+    trigger: device
+  conditions: []
+  actions:
+  - metadata: {}
     data:
       message: 'Replace batteries '
       title: Leak Sensor
+    action: notify.mobile_app_vics_iphone
   mode: single
 - id: '1711584978796'
   alias: lights.all.turn_off
@@ -464,47 +413,186 @@
       topic: rtl_433/{{trigger.payload_json.model or "UnknownModel"}}/{{trigger.payload_json.id
         or "UnknownId"}}/msg{{trigger.payload_json.message_type}}
   mode: single
-- id: '1730340042753'
-  alias: Plex down alert
+- id: '1731859032459'
+  alias: auto_off.master_bathroom.shower_fan
   description: ''
   triggers:
-  - trigger: state
-    entity_id:
-    - binary_sensor.plex_server_https_status
-    from: 'on'
-    to: 'off'
-    for:
-      hours: 0
-      minutes: 2
-      seconds: 0
-  conditions: []
-  actions:
-  - action: notify.mobile_app_vics_iphone
-    metadata: {}
-    data:
-      message: Plex server down
-  mode: single
-- id: '1731781634628'
-  alias: Shower Fan Auto-Off
-  description: Turn the shower fan off after 20 min
-  triggers:
-  - trigger: state
-    entity_id:
-    - switch.master_bathroom_shower_fan
-    to: 'on'
+  - trigger: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.shower_fan_timer
+    id: Timer Finished
+  - type: turned_on
+    device_id: ab4e7922c8937417d8280f022bd683ed
+    entity_id: 4a0cca88ccd7da8173342263ac554bb7
+    domain: switch
+    trigger: device
     for:
       hours: 0
       minutes: 0
       seconds: 1
+    id: Fan turned on
+  - type: turned_off
+    device_id: ab4e7922c8937417d8280f022bd683ed
+    entity_id: 4a0cca88ccd7da8173342263ac554bb7
+    domain: switch
+    trigger: device
+    id: Fan turned off
   conditions: []
   actions:
-  - delay:
-      hours: 0
-      minutes: 20
-      seconds: 0
-      milliseconds: 0
-  - target:
-      entity_id: switch.master_bathroom_shower_fan
-    action: switch.turn_off
-    data: {}
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - Fan turned on
+      sequence:
+      - action: timer.start
+        target:
+          entity_id: timer.shower_fan_timer
+        data:
+          duration:
+            hours: 0
+            minutes: '{{ states(''input_number.shower_timer'') | int }}'
+            seconds: 0
+            milliseconds: 0
+    - conditions:
+      - condition: trigger
+        id:
+        - Fan turned off
+      sequence:
+      - action: timer.cancel
+        target:
+          entity_id: timer.shower_fan_timer
+        data: {}
+    - conditions:
+      - condition: trigger
+        id:
+        - Timer Finished
+      sequence:
+      - type: turn_off
+        device_id: ab4e7922c8937417d8280f022bd683ed
+        entity_id: 4a0cca88ccd7da8173342263ac554bb7
+        domain: switch
   mode: single
+- id: '1731860780622'
+  alias: auto_off.front_washroom.exhaust_fan
+  description: ''
+  triggers:
+  - trigger: event
+    event_type: timer.finished
+    event_data:
+      entity_id: timer.front_bathroom_fan_timer
+    id: Timer Finished
+  - type: turned_on
+    device_id: bf9a119ceeac695161a680e323abb368
+    entity_id: ff7f7ba46fd70a450c88b4e419f1ef0c
+    domain: switch
+    trigger: device
+    id: Fan turned on
+  - type: turned_off
+    device_id: bf9a119ceeac695161a680e323abb368
+    entity_id: ff7f7ba46fd70a450c88b4e419f1ef0c
+    domain: switch
+    trigger: device
+    id: Fan turned off
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - Fan turned on
+      sequence:
+      - action: timer.start
+        target:
+          entity_id: timer.front_bathroom_fan_timer
+        data:
+          duration: 00:35:00
+    - conditions:
+      - condition: trigger
+        id:
+        - Fan turned off
+      sequence:
+      - action: timer.cancel
+        data: {}
+        target:
+          entity_id: timer.front_bathroom_fan_timer
+    - conditions:
+      - condition: trigger
+        id:
+        - Timer Finished
+      sequence:
+      - type: turn_off
+        device_id: bf9a119ceeac695161a680e323abb368
+        entity_id: ff7f7ba46fd70a450c88b4e419f1ef0c
+        domain: switch
+  mode: single
+- id: '1732845214224'
+  alias: Christmas
+  description: ''
+  triggers:
+  - event_data:
+      actionID: 13870D14-F29D-4979-BAAD-0502A06DB0CD
+    event_type: ios.action_fired
+    trigger: event
+  conditions: []
+  actions:
+  - type: turn_on
+    device_id: a36db20fbe381d6a63674e7044c23bd2
+    entity_id: 9ee6ecc8fe99d7bcf60bc21122e16f79
+    domain: switch
+  - type: turn_on
+    device_id: 262c6ec6fa515299fa25e2595fa54b88
+    entity_id: cf56c5d6f5e6bb685dc59a9988d703c0
+    domain: light
+  - type: turn_on
+    device_id: 61a72ee7ac5591874b6e7584583fbda7
+    entity_id: 7c726eb533f12bdc1de4a7243c551baa
+    domain: switch
+  - type: turn_on
+    device_id: 00f34f2e80cb9816e8c25a8f8adfb18e
+    entity_id: 57325e3a2f547279009b1d7c2011703f
+    domain: light
+  mode: single
+- id: '1732986664599'
+  alias: Turn on Downstairs heating
+  description: ''
+  triggers:
+  - trigger: time
+    at: '15:00:00'
+  conditions:
+  - condition: numeric_state
+    entity_id: sensor.mysa_698214_current_temperature
+    below: 20
+  actions:
+  - action: climate.set_temperature
+    metadata: {}
+    data:
+      temperature: 24
+      hvac_mode: heat
+    target:
+      entity_id: climate.mysa_698214_thermostat
+  mode: single
+- id: '1732986769207'
+  alias: Turn off downstairs heating
+  description: ''
+  triggers:
+  - trigger: time
+    at: '21:00:00'
+  conditions: []
+  actions:
+  - action: climate.turn_off
+    metadata: {}
+    data: {}
+    target:
+      entity_id: climate.mysa_698214_thermostat
+  mode: single
+- id: '1754785734123'
+  alias: 'Motion-activated Garage lights '
+  description: ''
+  use_blueprint:
+    path: homeassistant/motion_light.yaml
+    input:
+      motion_entity: binary_sensor.garage_motion
+      light_target:
+        area_id: garage

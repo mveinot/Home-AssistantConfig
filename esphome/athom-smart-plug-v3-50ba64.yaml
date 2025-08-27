@@ -1,16 +1,18 @@
 substitutions:
   name: athom-smart-plug-v3-50ba64
   friendly_name: Athom Plug V3 50ba64
+
 packages:
-  Athom_Technology.Smart_Plug_V3: github://athom-tech/esp32-configs/athom-smart-plug.yaml
+  - !include common/athom-smart-plug-v3.yaml
+
 esphome:
   name: ${name}
   name_add_mac_suffix: false
   friendly_name: ${friendly_name}
+
 api:
   encryption:
     key: Aqj6ED184XDSGkEDkGwZC/aVZnyv2eyUVS8RZzeyvb8=
-
 
 wifi:
   ssid: !secret wifi_ssid
